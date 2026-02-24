@@ -23,6 +23,10 @@ class ConfigurationHypotheses(BaseModel):
 class ConfigurationPortefeuille(BaseModel):
     tresorerie_initiale: float = 0.0
     comptes: list[str] = Field(default_factory=lambda: ["cash", "courtier"])
+    taux_investissement_restant: float = Field(default=1.0, ge=0.0, le=1.0)
+    rendement_annuel_investissement_restant: float | None = None
+    id_module_investissement_restant: str = "investissement_restant"
+    compte_investissement_restant: str = "courtier"
 
 
 class ConfigurationModuleBase(BaseModel):
@@ -32,19 +36,21 @@ class ConfigurationModuleBase(BaseModel):
 
 class ConfigurationModuleFluxFixe(ConfigurationModuleBase):
     type: Literal["flux_fixe"]
-    debut: str
-    fin: str
+    debut: str | None = None
+    fin: str | None = None
     montant: float
     frequence: Literal["mensuelle"] = "mensuelle"
     sens: Literal["revenu", "depense"]
     categorie: str
     compte: str = "cash"
+    indexation: Literal["aucune", "inflation"] = "aucune"
+    periode_reference: str | None = None
 
 
 class ConfigurationModuleInvestissementDCA(ConfigurationModuleBase):
     type: Literal["investissement_dca"]
-    debut: str
-    fin: str
+    debut: str | None = None
+    fin: str | None = None
     versement_mensuel: float
     rendement_annuel_attendu: float = Field(ge=0.0)
     compte: str = "courtier"

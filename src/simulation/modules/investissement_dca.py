@@ -14,9 +14,15 @@ class ModuleInvestissementDCA(ModuleSimulation):
         self.id_module = config.id
 
     def executer(self, contexte: ContexteSimulation) -> SortieModule:
-        debut = pd.Period(self.config.debut, freq="M")
-        fin = pd.Period(self.config.fin, freq="M")
-        periodes = contexte.calendrier[(contexte.calendrier >= debut) & (contexte.calendrier <= fin)]
+        debut_effectif = (
+            pd.Period(self.config.debut, freq="M") if self.config.debut else contexte.calendrier[0]
+        )
+        fin_effectif = (
+            pd.Period(self.config.fin, freq="M") if self.config.fin else contexte.calendrier[-1]
+        )
+        periodes = contexte.calendrier[
+            (contexte.calendrier >= debut_effectif) & (contexte.calendrier <= fin_effectif)
+        ]
         taux_mensuel = (1 + self.config.rendement_annuel_attendu) ** (1 / 12) - 1
 
         valeur = 0.0

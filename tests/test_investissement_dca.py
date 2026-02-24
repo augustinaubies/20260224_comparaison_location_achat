@@ -26,3 +26,24 @@ def test_dca_evolution_valeur_simple() -> None:
 
     assert float(valeur.iloc[-1]) == 300.0
     assert len(sortie.registre_lignes) == 3
+
+
+
+def test_dca_sans_bornes_utilise_calendrier_global() -> None:
+    config = ConfigurationModuleInvestissementDCA(
+        id="dca_global",
+        type="investissement_dca",
+        versement_mensuel=50,
+        rendement_annuel_attendu=0.0,
+        compte="courtier",
+    )
+    contexte = ContexteSimulation(
+        calendrier=pd.period_range("2025-01", "2025-04", freq="M"),
+        hypotheses={},
+        comptes=["courtier"],
+    )
+
+    sortie = ModuleInvestissementDCA(config).executer(contexte)
+
+    assert len(sortie.registre_lignes) == 4
+    assert float(sortie.etats["valeur_bourse"].iloc[-1]) == 200.0

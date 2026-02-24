@@ -25,7 +25,6 @@ from simulation.registre import calculer_synthese_mensuelle, normaliser_registre
 from simulation.resultat import ResultatSimulation
 
 
-
 def creer_module(config_module: object) -> ModuleSimulation:
     if isinstance(config_module, ConfigurationModuleFluxFixe):
         return ModuleFluxFixe(config_module)
@@ -37,6 +36,52 @@ def creer_module(config_module: object) -> ModuleSimulation:
         return ModuleImmobilierLocatif(config_module)
     raise ValueError(f"Type de module non supporté: {type(config_module)}")
 
+
+def generer_investissement_restant(
+    calendrier: pd.PeriodIndex,
+    registre_df: pd.DataFrame,
+    tresorerie_initiale: float,
+    taux: float,
+    rendement_annuel: float,
+    id_module: str,
+    compte: str,
+) -> tuple[pd.DataFrame, pd.Series]:
+    if taux <= 0:
+        return pd.DataFrame(columns=registre_df.columns), pd.Series(dtype=float, name="valeur_bourse")
+
+    flux_par_periode = registre_df.groupby("periode")["flux_de_tresorerie"].sum() if not registre_df.empty else None
+    taux_mensuel = (1 + rendement_annuel) ** (1 / 12) - 1
+
+    cash = tresorerie_initiale
+    valeur_bourse = 0.0
+    valeurs: list[float] = []
+    lignes: list[dict] = []
+
+    for periode in calendrier:
+        flux_periode = float(flux_par_periode.get(periode, 0.0)) if flux_par_periode is not None else 0.0
+        cash += flux_periode
+        versement = max(cash, 0.0) * taux
+        cash -= versement
+        valeur_bourse = valeur_bourse * (1 + taux_mensuel) + versement
+        valeurs.append(valeur_bourse)
+
+        if versement > 0:
+            lignes.append(
+                {
+                    "periode": periode,
+                    "id_module": id_module,
+                    "type_module": "investissement_restant",
+                    "flux_de_tresorerie": -versement,
+                    "categorie": "versement_restant",
+                    "compte": compte,
+                    "description": "Versement automatique du restant",
+                }
+            )
+
+    serie_valeur = pd.Series(valeurs, index=calendrier, dtype=float, name="valeur_bourse")
+    if not lignes:
+        return pd.DataFrame(columns=registre_df.columns), serie_valeur
+    return pd.DataFrame(lignes), serie_valeur
 
 
 def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path) -> None:
@@ -54,7 +99,6 @@ def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path) -> No
 
     with (dossier_sortie / "rapport.json").open("w", encoding="utf-8") as fichier:
         json.dump(resultat.metriques, fichier, ensure_ascii=False, indent=2)
-
 
 
 def executer_simulation(
@@ -80,20 +124,43 @@ def executer_simulation(
             registres.append(sortie.registre_lignes)
         etats_par_module[module.id_module] = sortie.etats
 
+    colonnes = [
+        "periode",
+        "id_module",
+        "type_module",
+        "flux_de_tresorerie",
+        "categorie",
+        "compte",
+        "description",
+    ]
     if registres:
-        registre_df = normaliser_registre(pd.concat(registres, ignore_index=True))
+        registre_initial = normaliser_registre(pd.concat(registres, ignore_index=True))
     else:
-        registre_df = pd.DataFrame(
-            columns=[
-                "periode",
-                "id_module",
-                "type_module",
-                "flux_de_tresorerie",
-                "categorie",
-                "compte",
-                "description",
-            ]
-        )
+        registre_initial = pd.DataFrame(columns=colonnes)
+
+    rendement_restant = config.portefeuille.rendement_annuel_investissement_restant
+    rendement_restant = (
+        config.hypotheses.rendement_marche if rendement_restant is None else rendement_restant
+    )
+    lignes_restant, valeur_bourse_restant = generer_investissement_restant(
+        calendrier=calendrier,
+        registre_df=registre_initial,
+        tresorerie_initiale=config.portefeuille.tresorerie_initiale,
+        taux=config.portefeuille.taux_investissement_restant,
+        rendement_annuel=rendement_restant,
+        id_module=config.portefeuille.id_module_investissement_restant,
+        compte=config.portefeuille.compte_investissement_restant,
+    )
+
+    if not lignes_restant.empty:
+        registre_df = normaliser_registre(pd.concat([registre_initial, lignes_restant], ignore_index=True))
+    else:
+        registre_df = registre_initial
+
+    etats_par_module[config.portefeuille.id_module_investissement_restant] = {
+        "valeur_bourse": valeur_bourse_restant
+    }
+
     synthese_df = calculer_synthese_mensuelle(registre_df, config.portefeuille.tresorerie_initiale)
     metriques = calculer_metriques(registre_df, synthese_df, etats_par_module)
 

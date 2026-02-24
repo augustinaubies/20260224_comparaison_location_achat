@@ -12,6 +12,10 @@ hypotheses:
 portefeuille:
   tresorerie_initiale: 20000
   comptes: ["cash", "courtier"]
+  taux_investissement_restant: 1.0
+  rendement_annuel_investissement_restant: null
+  id_module_investissement_restant: "investissement_restant"
+  compte_investissement_restant: "courtier"
 
 modules:
   - id: "salaire"
@@ -26,18 +30,15 @@ modules:
 
   - id: "depenses_vie"
     type: "flux_fixe"
-    debut: "2025-01"
-    fin: "2027-12"
     montant: 1800
     frequence: "mensuelle"
     sens: "depense"
     categorie: "depenses_courantes"
     compte: "cash"
+    indexation: "inflation"
 
   - id: "dca_monde"
     type: "investissement_dca"
-    debut: "2025-01"
-    fin: "2027-12"
     versement_mensuel: 500
     rendement_annuel_attendu: 0.06
     compte: "courtier"
