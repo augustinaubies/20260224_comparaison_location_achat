@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "moteur-simulation-portefeuille"
+version = "0.1.0"
+description = "Moteur de simulation de portefeuille modulaire (immobilier + investissements)."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Equipe Simulation" }]
+dependencies = [
+  "pandas>=2.2",
+  "numpy>=1.26",
+  "pydantic>=2.7",
+  "pyyaml>=6.0",
+  "typer>=0.12",
+  "rich>=13.7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "ruff>=0.5",
+]
+
+[project.scripts]
+simulation = "simulation.cli:application"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/simulation"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
