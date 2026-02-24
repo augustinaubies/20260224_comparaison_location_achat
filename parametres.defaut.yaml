@@ -1,0 +1,64 @@
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2027-12"
+  devise: "EUR"
+  pas_de_temps: "M"
+
+hypotheses:
+  inflation: 0.02
+  croissance_salaire: 0.01
+  rendement_marche: 0.05
+
+portefeuille:
+  tresorerie_initiale: 20000
+  comptes: ["cash", "courtier"]
+
+modules:
+  - id: "salaire"
+    type: "flux_fixe"
+    debut: "2025-01"
+    fin: "2027-12"
+    montant: 3000
+    frequence: "mensuelle"
+    sens: "revenu"
+    categorie: "salaire"
+    compte: "cash"
+
+  - id: "depenses_vie"
+    type: "flux_fixe"
+    debut: "2025-01"
+    fin: "2027-12"
+    montant: 1800
+    frequence: "mensuelle"
+    sens: "depense"
+    categorie: "depenses_courantes"
+    compte: "cash"
+
+  - id: "dca_monde"
+    type: "investissement_dca"
+    debut: "2025-01"
+    fin: "2027-12"
+    versement_mensuel: 500
+    rendement_annuel_attendu: 0.06
+    compte: "courtier"
+
+  - id: "locatif_lyon"
+    type: "immobilier_locatif"
+    date_achat: "2025-03"
+    prix: 220000
+    frais_notaire: 17000
+    budget_travaux: 8000
+    apport: 45000
+    emprunt:
+      capital: 175000
+      taux_annuel: 0.035
+      duree_mois: 240
+      assurance_mensuelle: 35
+    loyer_mensuel: 980
+    date_debut_location: "2025-06"
+    taux_vacance: 0.05
+    charges_mensuelles: 120
+    taxe_fonciere_annuelle: 1100
+    taux_entretien: 0.03
+    taux_gestion: 0.05
+    compte: "cash"
