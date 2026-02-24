@@ -11,6 +11,7 @@ from simulation.configuration import (
     ConfigurationModuleFluxFixe,
     ConfigurationModuleImmobilierLocatif,
     ConfigurationModuleInvestissementDCA,
+    ConfigurationRacine,
     charger_configuration,
 )
 from simulation.metriques import calculer_metriques
@@ -47,9 +48,15 @@ def generer_investissement_restant(
     compte: str,
 ) -> tuple[pd.DataFrame, pd.Series]:
     if taux <= 0:
-        return pd.DataFrame(columns=registre_df.columns), pd.Series(dtype=float, name="valeur_bourse")
+        return pd.DataFrame(columns=registre_df.columns), pd.Series(
+            dtype=float, name="valeur_bourse"
+        )
 
-    flux_par_periode = registre_df.groupby("periode")["flux_de_tresorerie"].sum() if not registre_df.empty else None
+    flux_par_periode = (
+        registre_df.groupby("periode")["flux_de_tresorerie"].sum()
+        if not registre_df.empty
+        else None
+    )
     taux_mensuel = (1 + rendement_annuel) ** (1 / 12) - 1
 
     cash = tresorerie_initiale
@@ -58,7 +65,9 @@ def generer_investissement_restant(
     lignes: list[dict] = []
 
     for periode in calendrier:
-        flux_periode = float(flux_par_periode.get(periode, 0.0)) if flux_par_periode is not None else 0.0
+        flux_periode = (
+            float(flux_par_periode.get(periode, 0.0)) if flux_par_periode is not None else 0.0
+        )
         cash += flux_periode
         versement = max(cash, 0.0) * taux
         cash -= versement
@@ -101,13 +110,12 @@ def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path) -> No
         json.dump(resultat.metriques, fichier, ensure_ascii=False, indent=2)
 
 
-def executer_simulation(
-    chemin_parametres_defaut: Path,
-    chemin_parametres_utilisateur: Path,
-    dossier_sortie: Path,
+def executer_simulation_depuis_config(
+    config: ConfigurationRacine, dossier_sortie: Path
 ) -> ResultatSimulation:
-    config = charger_configuration(chemin_parametres_defaut, chemin_parametres_utilisateur)
-    calendrier = construire_calendrier_mensuel(config.simulation.date_debut, config.simulation.date_fin)
+    calendrier = construire_calendrier_mensuel(
+        config.simulation.date_debut, config.simulation.date_fin
+    )
     contexte = ContexteSimulation(
         calendrier=calendrier,
         hypotheses=config.hypotheses.model_dump(),
@@ -153,7 +161,9 @@ def executer_simulation(
     )
 
     if not lignes_restant.empty:
-        registre_df = normaliser_registre(pd.concat([registre_initial, lignes_restant], ignore_index=True))
+        registre_df = normaliser_registre(
+            pd.concat([registre_initial, lignes_restant], ignore_index=True)
+        )
     else:
         registre_df = registre_initial
 
@@ -172,3 +182,12 @@ def executer_simulation(
     )
     exporter_resultats(resultat, dossier_sortie)
     return resultat
+
+
+def executer_simulation(
+    chemin_parametres_defaut: Path,
+    chemin_parametres_utilisateur: Path,
+    dossier_sortie: Path,
+) -> ResultatSimulation:
+    config = charger_configuration(chemin_parametres_defaut, chemin_parametres_utilisateur)
+    return executer_simulation_depuis_config(config, dossier_sortie)

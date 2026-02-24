@@ -1,0 +1,99 @@
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+from typer.testing import CliRunner
+
+from simulation.cli import application
+from simulation.configuration import charger_configuration
+
+
+def ecrire_parametres_defaut(chemin: Path) -> None:
+    chemin.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-02"
+hypotheses:
+  inflation: 0.02
+  rendement_marche: 0.05
+portefeuille:
+  tresorerie_initiale: 1000
+  comptes: ["cash", "courtier"]
+modules:
+  - id: "salaire"
+    type: "flux_fixe"
+    montant: 100
+    sens: "revenu"
+    categorie: "salaire"
+""".strip(),
+        encoding="utf-8",
+    )
+
+
+def test_cli_sans_arguments_cree_sortie_horodatee_et_exports(tmp_path: Path, monkeypatch) -> None:
+    ecrire_parametres_defaut(tmp_path / "parametres.defaut.yaml")
+    (tmp_path / "parametres.utilisateur.yaml").write_text("{}", encoding="utf-8")
+    (tmp_path / "ailleurs").mkdir()
+    monkeypatch.chdir(tmp_path / "ailleurs")
+    monkeypatch.setattr("simulation.cli.obtenir_racine_projet", lambda: tmp_path)
+
+    resultat = CliRunner().invoke(application, [])
+
+    assert resultat.exit_code == 0
+    assert "Statut: OK" in resultat.stdout
+
+    dossiers = sorted((tmp_path / "sorties").glob("*"))
+    assert len(dossiers) == 1
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}_\d{6}", dossiers[0].name)
+
+    fichiers = {chemin.name for chemin in dossiers[0].iterdir()}
+    assert "registre.csv" in fichiers
+    assert "synthese_mensuelle.csv" in fichiers
+    assert "rapport.json" in fichiers
+    assert any(nom.startswith("etats_module_") for nom in fichiers)
+
+
+def test_cli_absence_parametres_utilisateur_nest_pas_une_erreur(
+    tmp_path: Path, monkeypatch
+) -> None:
+    ecrire_parametres_defaut(tmp_path / "parametres.defaut.yaml")
+    monkeypatch.setattr("simulation.cli.obtenir_racine_projet", lambda: tmp_path)
+
+    resultat = CliRunner().invoke(application, [])
+
+    assert resultat.exit_code == 0
+    assert "utilisation des défauts uniquement" in resultat.stdout
+
+
+def test_fusion_configuration_utilisateur_ecrase_defaut(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    utilisateur = tmp_path / "parametres.utilisateur.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+hypotheses:
+  inflation: 0.02
+portefeuille:
+  tresorerie_initiale: 1000
+  comptes: ["cash", "courtier"]
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+    utilisateur.write_text(
+        """
+portefeuille:
+  tresorerie_initiale: 2500
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = charger_configuration(defaut, utilisateur)
+
+    assert config.portefeuille.tresorerie_initiale == 2500
+    assert config.portefeuille.comptes == ["cash", "courtier"]
+    assert config.hypotheses.inflation == 0.02

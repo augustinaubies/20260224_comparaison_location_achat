@@ -19,17 +19,40 @@ pip install -e .[dev]
 
 ## Exécution CLI
 
+Commande minimale (sans argument):
+
 ```bash
-python -m simulation.cli run \
-  --defaut parametres.defaut.yaml \
-  --utilisateur parametres.utilisateur.yaml \
-  --sortie resultats/run1
+python -m simulation.cli
 ```
+
+La CLI applique toujours cet ordre:
+
+1. `parametres.defaut.yaml` (chemin fixe à la racine du repo).
+2. `parametres.utilisateur.yaml` (même racine, facultatif).
+3. Export automatique dans `sorties/YYYY-MM-DD_HHMMSS` (timezone Europe/Paris).
+
+Vous pouvez aussi garder la commande explicite:
+
+```bash
+python -m simulation.cli run
+```
+
+Exemples d'override:
+
+```bash
+python -m simulation.cli \
+  --parametres-defaut /chemin/vers/parametres.defaut.yaml \
+  --parametres-utilisateur /chemin/vers/parametres.utilisateur.yaml \
+  --sortie /tmp/ma-sortie \
+  --nom-run test_rapide
+```
+
+> Si `--sortie` est fourni, la CLI écrit directement dans ce dossier (sans sous-dossier horodaté).
 
 ## Fichiers de configuration
 
 - `parametres.defaut.yaml`: paramètres publics versionnés.
-- `parametres.utilisateur.yaml`: surcharge locale simple à éditer.
+- `parametres.utilisateur.yaml`: surcharge locale simple à éditer (à placer à la racine du repo par défaut).
 
 Règle de chargement:
 
@@ -66,6 +89,17 @@ Règle de chargement:
 - `compte_investissement_restant`: compte de destination des versements (`courtier` par défaut).
 
 ## Structure des résultats
+
+Arborescence par défaut:
+
+```text
+sorties/
+  2026-02-24_154501/
+    registre.csv
+    synthese_mensuelle.csv
+    etats_module_<id>_<etat>.csv
+    rapport.json
+```
 
 - `registre.csv`:
   - Colonnes: `periode`, `id_module`, `type_module`, `flux_de_tresorerie`, `categorie`, `compte`, `description`.
