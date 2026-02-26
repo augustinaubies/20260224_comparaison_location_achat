@@ -56,7 +56,11 @@ class ModuleSimulation(ABC):
         etats_incrementaux: dict[str, Any] = {}
         for nom, serie in sortie_batch.etats.items():
             if isinstance(serie, pd.Series):
-                etats_incrementaux[nom] = float(serie.get(periode, 0.0))
+                valeur = serie.get(periode, 0.0)
+                if pd.api.types.is_bool_dtype(serie.dtype):
+                    etats_incrementaux[nom] = bool(valeur)
+                else:
+                    etats_incrementaux[nom] = float(valeur)
         return SortieMensuelle(lignes_registre=lignes, etats_incrementaux=etats_incrementaux)
 
     def executer_batch(self, contexte: ContexteSimulation) -> SortieModule:
