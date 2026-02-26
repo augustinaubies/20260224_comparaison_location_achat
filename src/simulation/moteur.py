@@ -11,7 +11,7 @@ from .configuration import (
     ConfigurationModuleEmprunt,
     ConfigurationModuleFluxFixe,
     ConfigurationModuleImmobilierLocatif,
-    ConfigurationModuleInvestissementDCA,
+    ConfigurationModuleResidencePrincipale,
     ConfigurationRacine,
     charger_configuration,
 )
@@ -21,7 +21,7 @@ from .modules import (
     ModuleEmprunt,
     ModuleFluxFixe,
     ModuleImmobilierLocatif,
-    ModuleInvestissementDCA,
+    ModuleResidencePrincipale,
 )
 from .modules.base import ContexteSimulation, ModuleSimulation
 from .registre import calculer_synthese_mensuelle, normaliser_registre
@@ -37,12 +37,12 @@ class OptionsDiagnostic:
 def creer_module(config_module: object) -> ModuleSimulation:
     if isinstance(config_module, ConfigurationModuleFluxFixe):
         return ModuleFluxFixe(config_module)
-    if isinstance(config_module, ConfigurationModuleInvestissementDCA):
-        return ModuleInvestissementDCA(config_module)
     if isinstance(config_module, ConfigurationModuleEmprunt):
         return ModuleEmprunt(config_module)
     if isinstance(config_module, ConfigurationModuleImmobilierLocatif):
         return ModuleImmobilierLocatif(config_module)
+    if isinstance(config_module, ConfigurationModuleResidencePrincipale):
+        return ModuleResidencePrincipale(config_module)
     raise ValueError(f"Type de module non supporté: {type(config_module)}")
 
 
@@ -103,6 +103,87 @@ def generer_investissement_restant(
         return pd.DataFrame(columns=registre_df.columns), serie_valeur
     return pd.DataFrame(lignes), serie_valeur
 
+
+def calculer_impot_progressif_france(revenu_imposable: float) -> float:
+    if revenu_imposable <= 0:
+        return 0.0
+    tranches = [
+        (11497.0, 0.0),
+        (29315.0, 0.11),
+        (83823.0, 0.30),
+        (180294.0, 0.41),
+        (float("inf"), 0.45),
+    ]
+    impot = 0.0
+    borne_precedente = 0.0
+    for borne, taux in tranches:
+        base = min(revenu_imposable, borne) - borne_precedente
+        if base > 0:
+            impot += base * taux
+        if revenu_imposable <= borne:
+            break
+        borne_precedente = borne
+    return impot
+
+
+def generer_impot_revenu(calendrier: pd.PeriodIndex, registre_df: pd.DataFrame, compte: str) -> pd.DataFrame:
+    if registre_df.empty:
+        return pd.DataFrame(columns=registre_df.columns)
+
+    salaires = registre_df[(registre_df["categorie"] == "salaire") & (registre_df["flux_de_tresorerie"] > 0)]
+    loyers_locatifs = registre_df[(registre_df["type_module"] == "immobilier_locatif") & (registre_df["categorie"] == "loyer") & (registre_df["flux_de_tresorerie"] > 0)]
+
+    lignes: list[dict] = []
+    for annee in sorted({p.year for p in calendrier}):
+        revenu_salaire = float(salaires[salaires["periode"].dt.year == annee]["flux_de_tresorerie"].sum()) if not salaires.empty else 0.0
+        revenu_locatif_micro_bic = 0.5 * float(loyers_locatifs[loyers_locatifs["periode"].dt.year == annee]["flux_de_tresorerie"].sum()) if not loyers_locatifs.empty else 0.0
+        impot = calculer_impot_progressif_france(revenu_salaire + revenu_locatif_micro_bic)
+        if impot <= 0:
+            continue
+        periode_prelevement = pd.Period(f"{annee}-12", freq="M")
+        if periode_prelevement not in calendrier:
+            continue
+        lignes.append(
+            {
+                "periode": periode_prelevement,
+                "id_module": "fiscalite",
+                "type_module": "fiscalite",
+                "flux_de_tresorerie": -impot,
+                "categorie": "impot_sur_le_revenu",
+                "compte": compte,
+                "description": "Prélèvement annuel d'impôt sur le revenu (décembre)",
+            }
+        )
+
+    return pd.DataFrame(lignes, columns=registre_df.columns) if lignes else pd.DataFrame(columns=registre_df.columns)
+
+
+def generer_loyer_residence_principale(
+    calendrier: pd.PeriodIndex,
+    montant_mensuel: float,
+    compte: str,
+    possession_rp: pd.Series | None,
+) -> pd.DataFrame:
+    if montant_mensuel <= 0:
+        return pd.DataFrame(columns=["periode", "id_module", "type_module", "flux_de_tresorerie", "categorie", "compte", "description"])
+
+    lignes = []
+    for periode in calendrier:
+        possede = bool(possession_rp.get(periode, False)) if possession_rp is not None else False
+        if possede:
+            continue
+        lignes.append(
+            {
+                "periode": periode,
+                "id_module": "loyer_residence_principale",
+                "type_module": "flux_global",
+                "flux_de_tresorerie": -montant_mensuel,
+                "categorie": "loyer_residence_principale",
+                "compte": compte,
+                "description": "Loyer résidence principale",
+            }
+        )
+    return pd.DataFrame(lignes)
 
 def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path) -> None:
     dossier_sortie.mkdir(parents=True, exist_ok=True)
@@ -225,10 +306,27 @@ def executer_simulation_depuis_config(
 
     for config_module in config.modules:
         module = creer_module(config_module)
+        breakpoint()
         sortie = module.executer(contexte)
         if not sortie.registre_lignes.empty:
             registres.append(sortie.registre_lignes)
         etats_par_module[module.id_module] = sortie.etats
+
+    possession_rp = None
+    for etats in etats_par_module.values():
+        serie_possession = etats.get("possede_residence_principale")
+        if isinstance(serie_possession, pd.Series):
+            possession_rp = serie_possession
+            break
+
+    loyer_rp = generer_loyer_residence_principale(
+        calendrier=calendrier,
+        montant_mensuel=config.portefeuille.loyer_residence_principale,
+        compte="cash",
+        possession_rp=possession_rp,
+    )
+    if not loyer_rp.empty:
+        registres.append(loyer_rp)
 
     colonnes = [
         "periode",
@@ -243,6 +341,10 @@ def executer_simulation_depuis_config(
         registre_initial = normaliser_registre(pd.concat(registres, ignore_index=True))
     else:
         registre_initial = pd.DataFrame(columns=colonnes)
+
+    impot_revenu = generer_impot_revenu(calendrier, registre_initial, compte="cash")
+    if not impot_revenu.empty:
+        registre_initial = normaliser_registre(pd.concat([registre_initial, impot_revenu], ignore_index=True))
 
     rendement_restant = config.portefeuille.rendement_annuel_investissement_restant
     rendement_restant = (

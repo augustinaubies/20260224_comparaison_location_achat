@@ -1,49 +1,30 @@
 from __future__ import annotations
 
-import pandas as pd
+from pathlib import Path
 
-from simulation.configuration import ConfigurationModuleInvestissementDCA
-from simulation.modules.base import ContexteSimulation
-from simulation.modules.investissement_dca import ModuleInvestissementDCA
+from simulation.configuration import charger_configuration
 
 
-def test_dca_evolution_valeur_simple() -> None:
-    config = ConfigurationModuleInvestissementDCA(
-        id="dca_test",
-        type="investissement_dca",
-        debut="2025-01",
-        fin="2025-03",
-        versement_mensuel=100,
-        rendement_annuel_attendu=0.0,
-        compte="courtier",
+def test_module_dca_est_ignore_sans_erreur(tmp_path: Path) -> None:
+    defaut = tmp_path / "defaut.yaml"
+    utilisateur = tmp_path / "utilisateur.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+portefeuille:
+  comptes: ["cash", "courtier"]
+modules:
+  - id: "dca"
+    type: "investissement_dca"
+    versement_mensuel: 100
+    rendement_annuel_attendu: 0.05
+""".strip(),
+        encoding="utf-8",
     )
-    contexte = ContexteSimulation(
-        calendrier=pd.period_range("2025-01", "2025-03", freq="M"), hypotheses={}, comptes=["courtier"]
-    )
+    utilisateur.write_text("{}", encoding="utf-8")
 
-    sortie = ModuleInvestissementDCA(config).executer(contexte)
-    valeur = sortie.etats["valeur_bourse"]
+    config = charger_configuration(defaut, utilisateur)
 
-    assert float(valeur.iloc[-1]) == 300.0
-    assert len(sortie.registre_lignes) == 3
-
-
-
-def test_dca_sans_bornes_utilise_calendrier_global() -> None:
-    config = ConfigurationModuleInvestissementDCA(
-        id="dca_global",
-        type="investissement_dca",
-        versement_mensuel=50,
-        rendement_annuel_attendu=0.0,
-        compte="courtier",
-    )
-    contexte = ContexteSimulation(
-        calendrier=pd.period_range("2025-01", "2025-04", freq="M"),
-        hypotheses={},
-        comptes=["courtier"],
-    )
-
-    sortie = ModuleInvestissementDCA(config).executer(contexte)
-
-    assert len(sortie.registre_lignes) == 4
-    assert float(sortie.etats["valeur_bourse"].iloc[-1]) == 200.0
+    assert config.modules == []

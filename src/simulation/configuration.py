@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal
+import warnings
 
 import yaml
 from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
@@ -28,6 +29,7 @@ class ConfigurationPortefeuille(BaseModel):
     rendement_annuel_investissement_restant: float | None = None
     id_module_investissement_restant: str = "investissement_restant"
     compte_investissement_restant: str = "courtier"
+    loyer_residence_principale: float = Field(default=0.0, ge=0.0)
 
 
 class ConfigurationModuleBase(BaseModel):
@@ -46,15 +48,6 @@ class ConfigurationModuleFluxFixe(ConfigurationModuleBase):
     compte: str = "cash"
     indexation: Literal["aucune", "inflation"] = "aucune"
     periode_reference: str | None = None
-
-
-class ConfigurationModuleInvestissementDCA(ConfigurationModuleBase):
-    type: Literal["investissement_dca"]
-    debut: str | None = None
-    fin: str | None = None
-    versement_mensuel: float
-    rendement_annuel_attendu: float = Field(ge=0.0)
-    compte: str = "courtier"
 
 
 class ConfigurationModuleEmprunt(ConfigurationModuleBase):
@@ -102,11 +95,28 @@ class ConfigurationModuleImmobilierLocatif(ConfigurationModuleBase):
         return self
 
 
+class ConfigurationModuleResidencePrincipale(ConfigurationModuleBase):
+    type: Literal["residence_principale"]
+    date_achat: str
+    prix: float = Field(gt=0.0)
+    frais_notaire: float = Field(ge=0.0)
+    apport: float = Field(ge=0.0)
+    emprunt: ConfigurationEmpruntIntegree
+    taxe_fonciere_annuelle: float = Field(default=0.0, ge=0.0)
+    compte: str = "cash"
+
+    @model_validator(mode="after")
+    def valider_apport(self) -> "ConfigurationModuleResidencePrincipale":
+        if self.apport > self.prix:
+            raise ValueError("L'apport ne peut pas dépasser le prix")
+        return self
+
+
 ConfigurationModule = Annotated[
     ConfigurationModuleFluxFixe
-    | ConfigurationModuleInvestissementDCA
     | ConfigurationModuleEmprunt
-    | ConfigurationModuleImmobilierLocatif,
+    | ConfigurationModuleImmobilierLocatif
+    | ConfigurationModuleResidencePrincipale,
     Field(discriminator="type"),
 ]
 
@@ -153,4 +163,26 @@ def charger_configuration(path_defaut: Path, path_utilisateur: Path) -> Configur
     donnees_defaut = charger_yaml(path_defaut)
     donnees_utilisateur = charger_yaml(path_utilisateur)
     donnees_fusionnees = fusion_profonde(donnees_defaut, donnees_utilisateur)
+    modules = donnees_fusionnees.get("modules")
+    if isinstance(modules, list):
+        modules_filtres: list[dict] = []
+        for module in modules:
+            if not isinstance(module, dict):
+                modules_filtres.append(module)
+                continue
+            if module.get("type") == "investissement_dca":
+                warnings.warn(
+                    "Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.",
+                    stacklevel=2,
+                )
+                continue
+            if "ville" in module:
+                warnings.warn(
+                    f"Le champ 'ville' du module '{module.get('id', 'sans_id')}' est déprécié et ignoré.",
+                    stacklevel=2,
+                )
+                module = dict(module)
+                module.pop("ville", None)
+            modules_filtres.append(module)
+        donnees_fusionnees["modules"] = modules_filtres
     return ConfigurationRacine.model_validate(donnees_fusionnees)

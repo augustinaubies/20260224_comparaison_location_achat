@@ -1,6 +1,6 @@
 # Moteur de simulation de portefeuille (Python)
 
-Projet modulaire pour simuler un portefeuille financier (flux de trésorerie, emprunts, immobilier locatif, investissement progressif) avec une architecture extensible orientée modules.
+Projet modulaire pour simuler un portefeuille financier (flux de trésorerie, emprunts, immobilier locatif, résidence principale, investissement automatique du restant) avec une architecture extensible orientée modules.
 
 ## Points clés
 
@@ -79,12 +79,6 @@ Règle de chargement:
   - Si absente, la référence est `debut` effectif du module.
   - En indexation inflation, la formule appliquée est: `montant(t) = montant_ref * (1+inflation)^(delta_mois/12)`.
 
-### `investissement_dca`
-
-- `debut` / `fin` (optionnels): si absents, le DCA s'applique sur tout le calendrier de simulation.
-- `versement_mensuel`: montant investi chaque mois.
-- `rendement_annuel_attendu`: rendement annualisé converti en rendement mensuel composé.
-
 ### `portefeuille`
 
 - `tresorerie_initiale`: cash de départ pour la synthèse de trésorerie.
@@ -95,6 +89,13 @@ Règle de chargement:
   - Si absent, utilise `hypotheses.rendement_marche`.
 - `id_module_investissement_restant`: identifiant de module utilisé dans le registre (`investissement_restant` par défaut).
 - `compte_investissement_restant`: compte de destination des versements (`courtier` par défaut).
+- `loyer_residence_principale`: loyer mensuel de RP tant qu'aucune RP n'est possédée.
+
+## Fiscalité
+
+- Un flux annuel `impot_sur_le_revenu` est généré en décembre.
+- Base imposable: salaires (`categorie=salaire`) + 50% des loyers locatifs meublés (`categorie=loyer`, hypothèse micro-BIC).
+- Barème progressif français appliqué par tranches (sans prélèvements sociaux supplémentaires).
 
 ## Structure des résultats
 
@@ -112,7 +113,7 @@ sorties/
 - `registre.csv`:
   - Colonnes: `periode`, `id_module`, `type_module`, `flux_de_tresorerie`, `categorie`, `compte`, `description`.
   - Convention de signe: flux entrant (revenu) positif, flux sortant (dépense/versement) négatif.
-  - Catégories fréquentes: `versement_dca`, `versement_restant`, `loyer`, `charges`, `depenses_courantes`, etc.
+  - Catégories fréquentes: `versement_restant`, `loyer`, `charges`, `loyer_residence_principale`, `impot_sur_le_revenu`, `depenses_courantes`, etc.
   - Le sweep automatique ajoute des lignes avec `categorie=versement_restant`.
 - `synthese_mensuelle.csv`:
   - `flux_net`: somme des flux du mois.
@@ -140,7 +141,8 @@ Exports additionnels en mode diagnostic:
   2. dépenses de vie,
   3. mensualités emprunt,
   4. charges locatives,
-  5. investissements (DCA puis investissement du restant).
+  5. impôt sur le revenu annuel (décembre),
+  6. investissement automatique du restant (jamais si cash restant <= 0).
 
 Invariants vérifiés mensuellement:
 
@@ -163,13 +165,21 @@ Invariants vérifiés mensuellement:
   indexation: "inflation"
 ```
 
-### DCA sur toute la simulation (sans `debut` / `fin`)
+### Résidence principale
 
 ```yaml
-- id: "dca_monde"
-  type: "investissement_dca"
-  versement_mensuel: 500
-  rendement_annuel_attendu: 0.06
+- id: "rp"
+  type: "residence_principale"
+  date_achat: 2025-03
+  prix: 320000
+  frais_notaire: 22000
+  apport: 40000
+  emprunt:
+    capital: 280000
+    taux_annuel: 0.032
+    duree_mois: 300
+    assurance_mensuelle: 45
+  taxe_fonciere_annuelle: 1400
 ```
 
 ### Sweep auto activé / désactivé

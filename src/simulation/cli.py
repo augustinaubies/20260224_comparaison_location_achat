@@ -11,6 +11,7 @@ from rich.table import Table
 
 from .configuration import charger_configuration
 from .moteur import OptionsDiagnostic, executer_simulation_depuis_config
+from pdb import set_trace as breakpoint
 
 application = typer.Typer(
     help="CLI du moteur de simulation de portefeuille.", invoke_without_command=True

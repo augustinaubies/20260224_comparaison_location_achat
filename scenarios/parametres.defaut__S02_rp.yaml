@@ -16,6 +16,7 @@ portefeuille:
   rendement_annuel_investissement_restant: 0.05
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
+  loyer_residence_principale: 1200
 modules:
 - id: salaire
   type: flux_fixe
@@ -34,18 +35,18 @@ modules:
   categorie: depenses_courantes
   compte: cash
   indexation: inflation
-- id: dca_monde
-  type: investissement_dca
-  versement_mensuel: 500
-  rendement_annuel_attendu: 0.06
-  compte: courtier
-- id: rp_emprunt
-  type: emprunt
-  date_debut: 2025-03
-  capital: 280000
-  taux_annuel: 0.032
-  duree_mois: 300
-  assurance_mensuelle: 45
+- id: rp
+  type: residence_principale
+  date_achat: 2025-03
+  prix: 320000
+  frais_notaire: 22000
+  apport: 40000
+  emprunt:
+    capital: 280000
+    taux_annuel: 0.032
+    duree_mois: 300
+    assurance_mensuelle: 45
+  taxe_fonciere_annuelle: 1400
   compte: cash
 - id: charges_rp
   type: flux_fixe

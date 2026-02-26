@@ -16,6 +16,7 @@ portefeuille:
   rendement_annuel_investissement_restant: 0.05
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
+  loyer_residence_principale: 1200
 modules:
 - id: salaire
   type: flux_fixe
@@ -34,11 +35,6 @@ modules:
   categorie: depenses_courantes
   compte: cash
   indexation: inflation
-- id: dca_monde
-  type: investissement_dca
-  versement_mensuel: 500
-  rendement_annuel_attendu: 0.06
-  compte: courtier
 - id: locatif_lyon
   type: immobilier_locatif
   date_achat: 2070-03

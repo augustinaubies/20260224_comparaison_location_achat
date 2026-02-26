@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from simulation.moteur import generer_investissement_restant
+from simulation.moteur import generer_impot_revenu, generer_investissement_restant
 
 
 def test_investissement_restant_tresorerie_initiale_uniquement() -> None:
@@ -22,6 +22,7 @@ def test_investissement_restant_tresorerie_initiale_uniquement() -> None:
     lignes, valeur_bourse = generer_investissement_restant(
         calendrier=calendrier,
         registre_df=registre_df,
+        comptes_tresorerie={"cash"},
         tresorerie_initiale=1000,
         taux=1.0,
         rendement_annuel=0.0,
@@ -50,6 +51,7 @@ def test_investissement_restant_avec_flux_positifs() -> None:
     lignes, valeur_bourse = generer_investissement_restant(
         calendrier=calendrier,
         registre_df=registre_df,
+        comptes_tresorerie={"cash"},
         tresorerie_initiale=0.0,
         taux=0.5,
         rendement_annuel=0.0,
@@ -78,6 +80,7 @@ def test_investissement_restant_taux_zero_aucune_ligne() -> None:
     lignes, _ = generer_investissement_restant(
         calendrier=calendrier,
         registre_df=registre_df,
+        comptes_tresorerie={"cash"},
         tresorerie_initiale=0.0,
         taux=0.0,
         rendement_annuel=0.0,
@@ -86,3 +89,43 @@ def test_investissement_restant_taux_zero_aucune_ligne() -> None:
     )
 
     assert lignes.empty
+
+
+def test_impot_revenu_salaire_seul() -> None:
+    calendrier = pd.period_range("2025-01", "2025-12", freq="M")
+    registre_df = pd.DataFrame(
+        {
+            "periode": calendrier,
+            "id_module": ["salaire"] * len(calendrier),
+            "type_module": ["flux_fixe"] * len(calendrier),
+            "flux_de_tresorerie": [3000.0] * len(calendrier),
+            "categorie": ["salaire"] * len(calendrier),
+            "compte": ["cash"] * len(calendrier),
+            "description": ["Salaire"] * len(calendrier),
+        }
+    )
+
+    impot = generer_impot_revenu(calendrier, registre_df, compte="cash")
+
+    assert len(impot) == 1
+    assert float(impot.iloc[0]["flux_de_tresorerie"]) == -3965.48
+
+
+def test_impot_revenu_avec_abattement_micro_bic() -> None:
+    calendrier = pd.period_range("2025-01", "2025-12", freq="M")
+    registre_df = pd.DataFrame(
+        {
+            "periode": list(calendrier) + list(calendrier),
+            "id_module": ["salaire"] * len(calendrier) + ["locatif"] * len(calendrier),
+            "type_module": ["flux_fixe"] * len(calendrier) + ["immobilier_locatif"] * len(calendrier),
+            "flux_de_tresorerie": [3000.0] * len(calendrier) + [1000.0] * len(calendrier),
+            "categorie": ["salaire"] * len(calendrier) + ["loyer"] * len(calendrier),
+            "compte": ["cash"] * (2 * len(calendrier)),
+            "description": ["Salaire"] * len(calendrier) + ["Loyer"] * len(calendrier),
+        }
+    )
+
+    impot = generer_impot_revenu(calendrier, registre_df, compte="cash")
+
+    assert len(impot) == 1
+    assert float(impot.iloc[0]["flux_de_tresorerie"]) == -5765.48
