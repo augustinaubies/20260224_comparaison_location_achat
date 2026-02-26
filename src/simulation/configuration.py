@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -94,6 +95,10 @@ class ConfigurationModuleImmobilierLocatif(ConfigurationModuleBase):
     def valider_apport(self) -> "ConfigurationModuleImmobilierLocatif":
         if self.apport > self.prix:
             raise ValueError("L'apport ne peut pas dépasser le prix")
+        date_achat = datetime.strptime(self.date_achat, "%Y-%m")
+        date_debut_location = datetime.strptime(self.date_debut_location, "%Y-%m")
+        if date_debut_location < date_achat:
+            raise ValueError("La date de début de location doit être postérieure ou égale à la date d'achat")
         return self
 
 

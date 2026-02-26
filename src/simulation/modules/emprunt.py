@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from simulation.configuration import ConfigurationModuleEmprunt
-from simulation.modules.base import ContexteSimulation, ModuleSimulation, SortieModule
+from ..configuration import ConfigurationModuleEmprunt
+from .base import ContexteSimulation, ModuleSimulation, SortieModule
 
 
 
@@ -14,6 +14,15 @@ def generer_echeancier(
     date_debut: str,
     calendrier_global: pd.PeriodIndex,
 ) -> pd.DataFrame:
+    colonnes = [
+        "periode",
+        "crd_debut",
+        "interets_payes",
+        "capital_rembourse",
+        "capital_restant_du",
+        "echeance_hors_assurance",
+        "taux_mensuel",
+    ]
     debut = pd.Period(date_debut, freq="M")
     periodes_completes = pd.period_range(debut, periods=duree_mois, freq="M")
     periodes = periodes_completes[periodes_completes.isin(calendrier_global)]
@@ -45,7 +54,9 @@ def generer_echeancier(
                     "taux_mensuel": taux_mensuel,
                 }
             )
-    return pd.DataFrame(lignes)
+    if not lignes:
+        return pd.DataFrame(columns=colonnes)
+    return pd.DataFrame(lignes, columns=colonnes)
 
 
 class ModuleEmprunt(ModuleSimulation):

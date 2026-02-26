@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from simulation.configuration import ConfigurationModuleFluxFixe
-from simulation.modules.base import ContexteSimulation, ModuleSimulation, SortieModule
+from ..configuration import ConfigurationModuleFluxFixe
+from .base import ContexteSimulation, ModuleSimulation, SortieModule
 
 
 class ModuleFluxFixe(ModuleSimulation):

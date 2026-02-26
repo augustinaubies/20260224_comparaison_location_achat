@@ -1,0 +1,586 @@
+[
+  {
+    "scenario": "B01_bug2030_derniere_echeance",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B01_bug2030_derniere_echeance.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/B01_bug2030_derniere_echeance",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B01_\nbug2030_derniere_echeance.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/B01_bug2030_dern\niere_echeance\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -48647.04 │\n│ Flux net cumulé        │ -848647.04 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/B01_bug2030_derniere_echeance",
+      "solde_final_tresorerie": -48647.044915620354,
+      "flux_net_cumule": -848647.0449156197,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 984.0,
+        "mean": -862.446183857337,
+        "std": 25562.667823913413,
+        "min": -801458.5171736488,
+        "1%": -1525.816159684472,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "B02_bug2030_taux_capital",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B02_bug2030_taux_capital.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/B02_bug2030_taux_capital",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B02_\nbug2030_taux_capital.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/B02_bug2030_taux\n_capital\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │ -106981.07 │\n│ Flux net cumulé        │ -906981.07 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/B02_bug2030_taux_capital",
+      "solde_final_tresorerie": -106981.07235277619,
+      "flux_net_cumule": -906981.0723527758,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 996.0,
+        "mean": -910.6235666192529,
+        "std": 25370.44804695866,
+        "min": -800098.2635492308,
+        "1%": -2886.0697841025903,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "B03_bug2030_decalage_debut",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B03_bug2030_decalage_debut.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/B03_bug2030_decalage_debut",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B03_\nbug2030_decalage_debut.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/B03_bug2030_deca\nlage_debut\n          Simulation terminée           \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓\n┃ Métrique               ┃      Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -256415.75 │\n│ Flux net cumulé        │ -1056415.75 │\n└────────────────────────┴─────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/B03_bug2030_decalage_debut",
+      "solde_final_tresorerie": -256415.75106830988,
+      "flux_net_cumule": -1056415.75106831,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 866.0,
+        "mean": -1219.8796201712591,
+        "std": 27321.447069093974,
+        "min": -802300.0,
+        "1%": -2298.126469784921,
+        "50%": -204.8434198335798,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E01_6_mois",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E01_6_mois.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E01_6_mois",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E01_\n6_mois.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E01_6_mois\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │       0.00 │\n│ Flux net cumulé        │ -800000.00 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E01_6_mois",
+      "solde_final_tresorerie": 0.0,
+      "flux_net_cumule": -800000.0,
+      "nb_anomalies": 0,
+      "anomalies": [],
+      "stats_flux": {
+        "count": 24.0,
+        "mean": -33333.333333333336,
+        "std": 163800.08925112896,
+        "min": -802300.0,
+        "1%": -618299.9240272602,
+        "50%": -350.82852288053107,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E02_40_ans",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E02_40_ans.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E02_40_ans",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E02_\n40_ans.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E02_40_ans\n          Simulation terminée           \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓\n┃ Métrique               ┃      Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -375752.42 │\n│ Flux net cumulé        │ -1175752.42 │\n└────────────────────────┴─────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E02_40_ans",
+      "solde_final_tresorerie": -375752.42264233413,
+      "flux_net_cumule": -1175752.4226423334,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2027-01"
+      ],
+      "stats_flux": {
+        "count": 3162.0,
+        "mean": -371.8382108293274,
+        "std": 14305.387299237738,
+        "min": -802300.0,
+        "1%": -785.8282036654412,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E03_debut_milieu_annee",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E03_debut_milieu_annee.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E03_debut_milieu_annee",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E03_\ndebut_milieu_annee.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E03_debut_milieu\n_annee\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -18935.42 │\n│ Flux net cumulé        │ -818935.42 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E03_debut_milieu_annee",
+      "solde_final_tresorerie": -18935.41889549885,
+      "flux_net_cumule": -818935.4188954985,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2026-03"
+      ],
+      "stats_flux": {
+        "count": 524.0,
+        "mean": -1562.853852854005,
+        "std": 35130.712086427666,
+        "min": -802300.0,
+        "1%": -2299.262598037639,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E04_inflation_zero",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E04_inflation_zero.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E04_inflation_zero",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E04_\ninflation_zero.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E04_inflation_ze\nro\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -84000.00 │\n│ Flux net cumulé        │ -884000.00 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E04_inflation_zero",
+      "solde_final_tresorerie": -84000.0,
+      "flux_net_cumule": -884000.0,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 384.0,
+        "mean": -2302.0833333333335,
+        "std": 40948.43724270403,
+        "min": -802300.0,
+        "1%": -2300.0,
+        "50%": -350.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E05_inflation_10",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E05_inflation_10.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E05_inflation_10",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E05_\ninflation_10.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E05_inflation_10\n          Simulation terminée           \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓\n┃ Métrique               ┃      Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -459028.19 │\n│ Flux net cumulé        │ -1259028.19 │\n└────────────────────────┴─────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E05_inflation_10",
+      "solde_final_tresorerie": -459028.18992956774,
+      "flux_net_cumule": -1259028.1899295684,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 384.0,
+        "mean": -3278.7192446082504,
+        "std": 40858.64737932833,
+        "min": -801000.0,
+        "1%": -5023.274799437619,
+        "50%": -509.6472122040411,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E06_inflation_negative",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E06_inflation_negative.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E06_inflation_negative",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E06_\ninflation_negative.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E06_inflation_ne\ngative\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -80470.28 │\n│ Flux net cumulé        │ -880470.28 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E06_inflation_negative",
+      "solde_final_tresorerie": -80470.27589421615,
+      "flux_net_cumule": -880470.2758942161,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 384.0,
+        "mean": -2292.891343474521,
+        "std": 40948.94094514738,
+        "min": -802300.0,
+        "1%": -2310.5438735096877,
+        "50%": -350.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E07_rendement_zero",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E07_rendement_zero.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E07_rendement_zero",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E07_\nrendement_zero.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E07_rendement_ze\nro\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -88142.56 │\n│ Flux net cumulé        │ -888142.56 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E07_rendement_zero",
+      "solde_final_tresorerie": -88142.56012508762,
+      "flux_net_cumule": -888142.5601250876,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 384.0,
+        "mean": -2312.8712503257498,
+        "std": 40947.85753257956,
+        "min": -802300.0,
+        "1%": -2298.7318905395323,
+        "50%": -379.1473656710451,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E08_crash_marche",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E08_crash_marche.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E08_crash_marche",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E08_\ncrash_marche.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E08_crash_marche\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -88142.56 │\n│ Flux net cumulé        │ -888142.56 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E08_crash_marche",
+      "solde_final_tresorerie": -88142.56012508762,
+      "flux_net_cumule": -888142.5601250876,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 384.0,
+        "mean": -2312.8712503257498,
+        "std": 40947.85753257956,
+        "min": -802300.0,
+        "1%": -2298.7318905395323,
+        "50%": -379.1473656710451,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E09_emprunt_cher_apport_zero",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E09_emprunt_cher_apport_zero.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E09_emprunt_cher_apport_zero",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E09_\nemprunt_cher_apport_zero.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E09_emprunt_cher\n_apport_zero\n          Simulation terminée           \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓\n┃ Métrique               ┃      Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -243550.21 │\n│ Flux net cumulé        │ -1043550.21 │\n└────────────────────────┴─────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E09_emprunt_cher_apport_zero",
+      "solde_final_tresorerie": -243550.21246953204,
+      "flux_net_cumule": -1043550.2124695327,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 1163.0,
+        "mean": -897.2916702231579,
+        "std": 22105.532615357835,
+        "min": -752285.6028971296,
+        "1%": -1979.3971028703747,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E10_pas_invest",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E10_pas_invest.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E10_pas_invest",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E10_\npas_invest.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E10_pas_invest\n         Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┓\n┃ Métrique               ┃    Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━┩\n│ Solde final trésorerie │ 872445.39 │\n│ Flux net cumulé        │  72445.39 │\n└────────────────────────┴───────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E10_pas_invest",
+      "solde_final_tresorerie": 872445.391805727,
+      "flux_net_cumule": 72445.39180572692,
+      "nb_anomalies": 0,
+      "anomalies": [],
+      "stats_flux": {
+        "count": 348.0,
+        "mean": 208.17641323484742,
+        "std": 955.895822979996,
+        "min": -258.2947313420902,
+        "1%": -256.8199824061754,
+        "50%": -0.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E11_salaire_nul_periode",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E11_salaire_nul_periode.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E11_salaire_nul_periode",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E11_\nsalaire_nul_periode.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E11_salaire_nul_\nperiode\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -62276.84 │\n│ Flux net cumulé        │ -862276.84 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E11_salaire_nul_periode",
+      "solde_final_tresorerie": -62276.8354176837,
+      "flux_net_cumule": -862276.8354176836,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2027-01"
+      ],
+      "stats_flux": {
+        "count": 429.0,
+        "mean": -2009.9693133279345,
+        "std": 38769.56301474317,
+        "min": -802500.0,
+        "1%": -2585.193179076196,
+        "50%": -257.8688399876188,
+        "99%": 3300.0,
+        "max": 3300.0
+      }
+    }
+  },
+  {
+    "scenario": "E12_depenses_sup_salaire",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E12_depenses_sup_salaire.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E12_depenses_sup_salaire",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E12_\ndepenses_sup_salaire.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E12_depenses_sup\n_salaire\n          Simulation terminée           \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓\n┃ Métrique               ┃      Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -626205.64 │\n│ Flux net cumulé        │ -1426205.64 │\n└────────────────────────┴─────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E12_depenses_sup_salaire",
+      "solde_final_tresorerie": -626205.6433997785,
+      "flux_net_cumule": -1426205.6433997788,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2025-02"
+      ],
+      "stats_flux": {
+        "count": 349.0,
+        "mean": -4086.549121489338,
+        "std": 42671.36163680257,
+        "min": -798000.0,
+        "1%": -4501.698190616224,
+        "50%": -500.0,
+        "99%": 2000.0,
+        "max": 2000.0
+      }
+    }
+  },
+  {
+    "scenario": "E13_loyer_nul_vacance_100",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E13_loyer_nul_vacance_100.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E13_loyer_nul_vacance_100",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E13_\nloyer_nul_vacance_100.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E13_loyer_nul_va\ncance_100\n          Simulation terminée           \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓\n┃ Métrique               ┃      Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -273190.35 │\n│ Flux net cumulé        │ -1073190.35 │\n└────────────────────────┴─────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E13_loyer_nul_vacance_100",
+      "solde_final_tresorerie": -273190.3483638533,
+      "flux_net_cumule": -1073190.348363853,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2025-02"
+      ],
+      "stats_flux": {
+        "count": 1124.0,
+        "mean": -954.7956835977341,
+        "std": 23976.33748889582,
+        "min": -802300.0,
+        "1%": -1014.9295064704106,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E14_emprunt_5_ans",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E14_emprunt_5_ans.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E14_emprunt_5_ans",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E14_\nemprunt_5_ans.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E14_emprunt_5_an\ns\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -86252.71 │\n│ Flux net cumulé        │ -886252.71 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E14_emprunt_5_ans",
+      "solde_final_tresorerie": -86252.7083455046,
+      "flux_net_cumule": -886252.7083455038,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2025-02"
+      ],
+      "stats_flux": {
+        "count": 937.0,
+        "mean": -945.8406705928536,
+        "std": 23890.25622376319,
+        "min": -729081.4446302052,
+        "1%": -3183.5553697948576,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "E15_emprunt_30_ans",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E15_emprunt_30_ans.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E15_emprunt_30_ans",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E15_\nemprunt_30_ans.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E15_emprunt_30_a\nns\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │ -100321.94 │\n│ Flux net cumulé        │ -900321.94 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E15_emprunt_30_ans",
+      "solde_final_tresorerie": -100321.94456494087,
+      "flux_net_cumule": -900321.9445649406,
+      "nb_anomalies": 1,
+      "anomalies": [
+        "Trésorerie négative dès 2028-01"
+      ],
+      "stats_flux": {
+        "count": 1164.0,
+        "mean": -773.4724609664439,
+        "std": 21498.40921479814,
+        "min": -731479.1717963346,
+        "1%": -2195.6364090544243,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "S01_sans_immo",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S01_sans_immo.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/S01_sans_immo",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S01_\nsans_immo.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/S01_sans_immo\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │ 1154445.39 │\n│ Flux net cumulé        │  354445.39 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/S01_sans_immo",
+      "solde_final_tresorerie": 1154445.391805727,
+      "flux_net_cumule": 354445.3918057269,
+      "nb_anomalies": 0,
+      "anomalies": [],
+      "stats_flux": {
+        "count": 468.0,
+        "mean": 757.3619483028353,
+        "std": 1591.4013106174407,
+        "min": -500.0,
+        "1%": -500.0,
+        "50%": -227.2861224055,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "S02_rp",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S02_rp.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/S02_rp",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S02_\nrp.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/S02_rp\n         Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┓\n┃ Métrique               ┃    Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━┩\n│ Solde final trésorerie │ 838421.81 │\n│ Flux net cumulé        │  38421.81 │\n└────────────────────────┴───────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/S02_rp",
+      "solde_final_tresorerie": 838421.8148334577,
+      "flux_net_cumule": 38421.81483345764,
+      "nb_anomalies": 0,
+      "anomalies": [],
+      "stats_flux": {
+        "count": 930.0,
+        "mean": 41.31377939081469,
+        "std": 1391.409528800557,
+        "min": -1357.1011491705797,
+        "1%": -1357.1011491705797,
+        "50%": -258.08178566485446,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "S03_locatif_seul",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S03_locatif_seul.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/S03_locatif_seul",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S03_\nlocatif_seul.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/S03_locatif_seul\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  963764.32 │\n│ Flux net cumulé        │ -236235.68 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/S03_locatif_seul",
+      "solde_final_tresorerie": 963764.3183028132,
+      "flux_net_cumule": -236235.68169718672,
+      "nb_anomalies": 0,
+      "anomalies": [],
+      "stats_flux": {
+        "count": 1084.0,
+        "mean": -217.92959566161142,
+        "std": 1570.0395456062256,
+        "min": -45000.0,
+        "1%": -1014.9295064704106,
+        "50%": -120.0,
+        "99%": 931.0,
+        "max": 931.0
+      }
+    }
+  },
+  {
+    "scenario": "S04_rp_puis_locatif",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S04_rp_puis_locatif.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/S04_rp_puis_locatif",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S04_\nrp_puis_locatif.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/S04_rp_puis_loca\ntif\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │ 1525515.45 │\n│ Flux net cumulé        │   25515.45 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/S04_rp_puis_locatif",
+      "solde_final_tresorerie": 1525515.4519934081,
+      "flux_net_cumule": 25515.451993408213,
+      "nb_anomalies": 0,
+      "anomalies": [],
+      "stats_flux": {
+        "count": 1349.0,
+        "mean": 18.914345436181016,
+        "std": 1792.776203645743,
+        "min": -45000.0,
+        "1%": -1251.044447350553,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  },
+  {
+    "scenario": "S05_inflation_moderee",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S05_inflation_moderee.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/S05_inflation_moderee",
+    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__S05_\ninflation_moderee.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/S05_inflation_mo\nderee\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │ 1228278.15 │\n│ Flux net cumulé        │  -71721.85 │\n└────────────────────────┴────────────┘\nStatut: OK",
+    "stderr": "",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/S05_inflation_moderee",
+      "solde_final_tresorerie": 1228278.1488724665,
+      "flux_net_cumule": -71721.85112753355,
+      "nb_anomalies": 0,
+      "anomalies": [],
+      "stats_flux": {
+        "count": 1182.0,
+        "mean": -60.678385048674805,
+        "std": 2026.365254498454,
+        "min": -45000.0,
+        "1%": -2580.252443186068,
+        "50%": -120.0,
+        "99%": 3000.0,
+        "max": 3000.0
+      }
+    }
+  }
+]

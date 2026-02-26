@@ -1,6 +1,6 @@
 """Paquet du moteur de simulation de portefeuille."""
 
-from simulation.moteur import executer_simulation
-from simulation.resultat import ResultatSimulation
+from .moteur import executer_simulation
+from .resultat import ResultatSimulation
 
 __all__ = ["ResultatSimulation", "executer_simulation"]

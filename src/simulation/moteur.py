@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from simulation.calendrier import construire_calendrier_mensuel
-from simulation.configuration import (
+from .calendrier import construire_calendrier_mensuel
+from .configuration import (
     ConfigurationModuleEmprunt,
     ConfigurationModuleFluxFixe,
     ConfigurationModuleImmobilierLocatif,
@@ -15,17 +15,17 @@ from simulation.configuration import (
     ConfigurationRacine,
     charger_configuration,
 )
-from simulation.metriques import calculer_metriques
-from simulation.invariants import AnomalieInvariant, determiner_comptes_tresorerie, verifier_invariants
-from simulation.modules import (
+from .metriques import calculer_metriques
+from .invariants import AnomalieInvariant, determiner_comptes_tresorerie, verifier_invariants
+from .modules import (
     ModuleEmprunt,
     ModuleFluxFixe,
     ModuleImmobilierLocatif,
     ModuleInvestissementDCA,
 )
-from simulation.modules.base import ContexteSimulation, ModuleSimulation
-from simulation.registre import calculer_synthese_mensuelle, normaliser_registre
-from simulation.resultat import ResultatSimulation
+from .modules.base import ContexteSimulation, ModuleSimulation
+from .registre import calculer_synthese_mensuelle, normaliser_registre
+from .resultat import ResultatSimulation
 
 
 @dataclass(slots=True)

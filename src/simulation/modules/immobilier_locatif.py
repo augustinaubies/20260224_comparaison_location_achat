@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pandas as pd
 
-from simulation.configuration import ConfigurationModuleImmobilierLocatif
-from simulation.modules.base import ContexteSimulation, ModuleSimulation, SortieModule
-from simulation.modules.emprunt import generer_echeancier
+from ..configuration import ConfigurationModuleImmobilierLocatif
+from .base import ContexteSimulation, ModuleSimulation, SortieModule
+from .emprunt import generer_echeancier
 
 
 class ModuleImmobilierLocatif(ModuleSimulation):

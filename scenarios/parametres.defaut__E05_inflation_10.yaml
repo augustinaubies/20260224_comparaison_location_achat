@@ -4,7 +4,7 @@ simulation:
   devise: EUR
   pas_de_temps: M
 hypotheses:
-  inflation: 0.02
+  inflation: 0.1
   croissance_salaire: 0.02
   rendement_marche: 0.05
 portefeuille:
@@ -28,7 +28,7 @@ modules:
   compte: cash
 - id: depenses_vie
   type: flux_fixe
-  montant: 200
+  montant: 1500
   frequence: mensuelle
   sens: depense
   categorie: depenses_courantes

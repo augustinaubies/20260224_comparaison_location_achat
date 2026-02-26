@@ -41,7 +41,7 @@ modules:
   compte: courtier
 - id: locatif_lyon
   type: immobilier_locatif
-  date_achat: 2070-03
+  date_achat: 2025-01
   prix: 220000
   frais_notaire: 17000
   budget_travaux: 8000
@@ -49,10 +49,10 @@ modules:
   emprunt:
     capital: 175000
     taux_annuel: 0.035
-    duree_mois: 240
+    duree_mois: 60
     assurance_mensuelle: 35
   loyer_mensuel: 980
-  date_debut_location: 2070-06
+  date_debut_location: 2025-02
   taux_vacance: 0.05
   charges_mensuelles: 120
   taxe_fonciere_annuelle: 1100

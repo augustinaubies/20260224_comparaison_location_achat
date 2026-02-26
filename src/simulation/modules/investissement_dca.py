@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from simulation.configuration import ConfigurationModuleInvestissementDCA
-from simulation.modules.base import ContexteSimulation, ModuleSimulation, SortieModule
+from ..configuration import ConfigurationModuleInvestissementDCA
+from .base import ContexteSimulation, ModuleSimulation, SortieModule
 
 
 class ModuleInvestissementDCA(ModuleSimulation):
