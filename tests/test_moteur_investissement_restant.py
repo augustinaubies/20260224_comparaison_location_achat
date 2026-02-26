@@ -92,16 +92,16 @@ def test_investissement_restant_taux_zero_aucune_ligne() -> None:
 
 
 def test_impot_revenu_salaire_seul() -> None:
-    calendrier = pd.period_range("2025-01", "2025-12", freq="M")
+    calendrier = pd.period_range("2025-01", "2026-12", freq="M")
     registre_df = pd.DataFrame(
         {
-            "periode": calendrier,
-            "id_module": ["salaire"] * len(calendrier),
-            "type_module": ["flux_fixe"] * len(calendrier),
-            "flux_de_tresorerie": [3000.0] * len(calendrier),
-            "categorie": ["salaire"] * len(calendrier),
-            "compte": ["cash"] * len(calendrier),
-            "description": ["Salaire"] * len(calendrier),
+            "periode": list(pd.period_range("2025-01", "2025-12", freq="M")),
+            "id_module": ["salaire"] * 12,
+            "type_module": ["flux_fixe"] * 12,
+            "flux_de_tresorerie": [3000.0] * 12,
+            "categorie": ["salaire"] * 12,
+            "compte": ["cash"] * 12,
+            "description": ["Salaire"] * 12,
         }
     )
 
@@ -112,16 +112,17 @@ def test_impot_revenu_salaire_seul() -> None:
 
 
 def test_impot_revenu_avec_abattement_micro_bic() -> None:
-    calendrier = pd.period_range("2025-01", "2025-12", freq="M")
+    calendrier = pd.period_range("2025-01", "2026-12", freq="M")
+    periode_imposable = list(pd.period_range("2025-01", "2025-12", freq="M"))
     registre_df = pd.DataFrame(
         {
-            "periode": list(calendrier) + list(calendrier),
-            "id_module": ["salaire"] * len(calendrier) + ["locatif"] * len(calendrier),
-            "type_module": ["flux_fixe"] * len(calendrier) + ["immobilier_locatif"] * len(calendrier),
-            "flux_de_tresorerie": [3000.0] * len(calendrier) + [1000.0] * len(calendrier),
-            "categorie": ["salaire"] * len(calendrier) + ["loyer"] * len(calendrier),
-            "compte": ["cash"] * (2 * len(calendrier)),
-            "description": ["Salaire"] * len(calendrier) + ["Loyer"] * len(calendrier),
+            "periode": periode_imposable + periode_imposable,
+            "id_module": ["salaire"] * 12 + ["locatif"] * 12,
+            "type_module": ["flux_fixe"] * 12 + ["immobilier_locatif"] * 12,
+            "flux_de_tresorerie": [3000.0] * 12 + [1000.0] * 12,
+            "categorie": ["salaire"] * 12 + ["loyer"] * 12,
+            "compte": ["cash"] * 24,
+            "description": ["Salaire"] * 12 + ["Loyer"] * 12,
         }
     )
 

@@ -20,8 +20,8 @@ portefeuille:
 modules:
 - id: salaire
   type: flux_fixe
-  debut: 2025-01
-  fin: 2027-12
+  debut: simulation.date_debut
+  fin: simulation.date_fin
   montant: 3000
   frequence: mensuelle
   sens: revenu

@@ -13,7 +13,7 @@ class ModuleInvestissementDCA(ModuleSimulation):
         self.config = config
         self.id_module = config.id
 
-    def executer(self, contexte: ContexteSimulation) -> SortieModule:
+    def executer_batch(self, contexte: ContexteSimulation) -> SortieModule:
         debut_effectif = (
             pd.Period(self.config.debut, freq="M") if self.config.debut else contexte.calendrier[0]
         )

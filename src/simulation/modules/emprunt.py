@@ -66,7 +66,7 @@ class ModuleEmprunt(ModuleSimulation):
         self.config = config
         self.id_module = config.id
 
-    def executer(self, contexte: ContexteSimulation) -> SortieModule:
+    def executer_batch(self, contexte: ContexteSimulation) -> SortieModule:
         echeancier = generer_echeancier(
             capital=self.config.capital,
             taux_annuel=self.config.taux_annuel,

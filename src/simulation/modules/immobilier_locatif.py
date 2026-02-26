@@ -14,7 +14,7 @@ class ModuleImmobilierLocatif(ModuleSimulation):
         self.config = config
         self.id_module = config.id
 
-    def executer(self, contexte: ContexteSimulation) -> SortieModule:
+    def executer_batch(self, contexte: ContexteSimulation) -> SortieModule:
         lignes: list[dict] = []
 
         periode_achat = pd.Period(self.config.date_achat, freq="M")

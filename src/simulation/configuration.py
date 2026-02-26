@@ -14,6 +14,7 @@ class ConfigurationSimulation(BaseModel):
     date_fin: str
     devise: str = "EUR"
     pas_de_temps: Literal["M"] = "M"
+    mois_paiement_impot_revenu: int = Field(default=9, ge=1, le=12)
 
 
 class ConfigurationHypotheses(BaseModel):
@@ -147,6 +148,34 @@ def fusion_profonde(base: dict, surcharge: dict) -> dict:
     return resultat
 
 
+def _obtenir_par_chemin_insensible_casse(donnees: object, chemin: str) -> object:
+    courant = donnees
+    for segment in chemin.split("."):
+        if not isinstance(courant, dict):
+            raise KeyError(chemin)
+        correspondance = next((cle for cle in courant.keys() if str(cle).lower() == segment.lower()), None)
+        if correspondance is None:
+            raise KeyError(chemin)
+        courant = courant[correspondance]
+    return courant
+
+
+def _resoudre_references_config(valeur: object, racine: dict) -> object:
+    if isinstance(valeur, dict):
+        return {cle: _resoudre_references_config(v, racine) for cle, v in valeur.items()}
+    if isinstance(valeur, list):
+        return [_resoudre_references_config(v, racine) for v in valeur]
+    if isinstance(valeur, str) and "." in valeur and valeur.strip() == valeur:
+        try:
+            cible = _obtenir_par_chemin_insensible_casse(racine, valeur)
+        except KeyError:
+            return valeur
+        if isinstance(cible, (dict, list)):
+            return valeur
+        return cible
+    return valeur
+
+
 
 def charger_yaml(path: Path) -> dict:
     if not path.exists():
@@ -163,6 +192,7 @@ def charger_configuration(path_defaut: Path, path_utilisateur: Path) -> Configur
     donnees_defaut = charger_yaml(path_defaut)
     donnees_utilisateur = charger_yaml(path_utilisateur)
     donnees_fusionnees = fusion_profonde(donnees_defaut, donnees_utilisateur)
+    donnees_fusionnees = _resoudre_references_config(donnees_fusionnees, donnees_fusionnees)
     modules = donnees_fusionnees.get("modules")
     if isinstance(modules, list):
         modules_filtres: list[dict] = []
