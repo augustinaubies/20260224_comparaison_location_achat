@@ -1,6 +1,0 @@
-# Surcharge locale (optionnelle).
-# Ce fichier peut rester vide: dans ce cas aucune valeur ne remplace parametres.defaut.yaml.
-# Exemple:
-# portefeuille:
-#   tresorerie_initiale: 25000
-{}
