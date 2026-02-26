@@ -19,6 +19,7 @@ def normaliser_registre(df: pd.DataFrame) -> pd.DataFrame:
     if "periode" not in resultat.columns:
         resultat = resultat.reset_index().rename(columns={"index": "periode"})
     resultat = resultat[COLONNES_REGISTRE]
+    resultat["montant_abs"] = resultat["flux_de_tresorerie"].abs().round(6)
     resultat = resultat.sort_values(["periode", "id_module", "categorie"]).reset_index(drop=True)
     return resultat
 

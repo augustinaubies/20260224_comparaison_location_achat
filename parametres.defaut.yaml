@@ -1,19 +1,19 @@
 simulation:
   date_debut: "2025-01"
-  date_fin: "2027-12"
+  date_fin: "2037-12"
   devise: "EUR"
   pas_de_temps: "M"
 
 hypotheses:
   inflation: 0.02
-  croissance_salaire: 0.01
+  croissance_salaire: 0.02
   rendement_marche: 0.05
 
 portefeuille:
-  tresorerie_initiale: 20000
+  tresorerie_initiale: 800000
   comptes: ["cash", "courtier"]
   taux_investissement_restant: 1.0
-  rendement_annuel_investissement_restant: null
+  rendement_annuel_investissement_restant: 0.05
   id_module_investissement_restant: "investissement_restant"
   compte_investissement_restant: "courtier"
 
@@ -30,7 +30,7 @@ modules:
 
   - id: "depenses_vie"
     type: "flux_fixe"
-    montant: 1800
+    montant: 200
     frequence: "mensuelle"
     sens: "depense"
     categorie: "depenses_courantes"
@@ -45,7 +45,7 @@ modules:
 
   - id: "locatif_lyon"
     type: "immobilier_locatif"
-    date_achat: "2025-03"
+    date_achat: "2070-03"
     prix: 220000
     frais_notaire: 17000
     budget_travaux: 8000

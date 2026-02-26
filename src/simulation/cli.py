@@ -4,12 +4,13 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import pandas as pd
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from simulation.configuration import charger_configuration
-from simulation.moteur import executer_simulation_depuis_config
+from simulation.moteur import OptionsDiagnostic, executer_simulation_depuis_config
 
 application = typer.Typer(
     help="CLI du moteur de simulation de portefeuille.", invoke_without_command=True
@@ -49,6 +50,8 @@ def lancer_simulation(
     parametres_utilisateur: Path | None,
     sortie: Path | None,
     nom_run: str | None,
+    diagnostic: bool,
+    periode_debug: list[str] | None,
 ) -> None:
     chemin_defaut = parametres_defaut or chemin_parametres_defaut()
     chemin_utilisateur = parametres_utilisateur or chemin_parametres_utilisateur()
@@ -61,7 +64,12 @@ def lancer_simulation(
 
         dossier_sortie = creer_dossier_sortie(sortie=sortie, nom_run=nom_run)
         config = charger_configuration(chemin_defaut, chemin_utilisateur)
-        resultat = executer_simulation_depuis_config(config, dossier_sortie)
+        periodes_debug = {pd.Period(p, freq="M") for p in (periode_debug or [])}
+        resultat = executer_simulation_depuis_config(
+            config,
+            dossier_sortie,
+            options_diagnostic=OptionsDiagnostic(actif=diagnostic, periodes_debug=periodes_debug),
+        )
 
         table = Table(title="Simulation terminée")
         table.add_column("Métrique")
@@ -94,10 +102,12 @@ def commande_principale(
     parametres_utilisateur: Path = typer.Option(None, "--parametres-utilisateur", "--utilisateur"),
     sortie: Path | None = typer.Option(None, "--sortie"),
     nom_run: str | None = typer.Option(None, "--nom-run"),
+    diagnostic: bool = typer.Option(False, "--diagnostic"),
+    periode_debug: list[str] = typer.Option([], "--periode-debug"),
 ) -> None:
     """Exécute une simulation complète avec fusion défaut + utilisateur."""
     if ctx.invoked_subcommand is None:
-        lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run)
+        lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run, diagnostic, periode_debug)
 
 
 @application.command("run")
@@ -106,9 +116,11 @@ def commande_run(
     parametres_utilisateur: Path = typer.Option(None, "--parametres-utilisateur", "--utilisateur"),
     sortie: Path | None = typer.Option(None, "--sortie"),
     nom_run: str | None = typer.Option(None, "--nom-run"),
+    diagnostic: bool = typer.Option(False, "--diagnostic"),
+    periode_debug: list[str] = typer.Option([], "--periode-debug"),
 ) -> None:
     """Alias explicite pour lancer la simulation."""
-    lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run)
+    lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run, diagnostic, periode_debug)
 
 
 if __name__ == "__main__":

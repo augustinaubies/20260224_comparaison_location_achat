@@ -36,4 +36,4 @@ target-version = "py311"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-testpaths = ["tests"]
+testpaths = ["tests", "tests_coherence"]

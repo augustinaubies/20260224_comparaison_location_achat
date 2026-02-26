@@ -49,6 +49,14 @@ python -m simulation.cli \
 
 > Si `--sortie` est fourni, la CLI écrit directement dans ce dossier (sans sous-dossier horodaté).
 
+Mode diagnostic (invariants stricts + exports de debug):
+
+```bash
+python -m simulation.cli run --diagnostic --periode-debug 2030-01 --periode-debug 2030-05
+```
+
+En mode `--diagnostic`, toute violation d'invariant provoque un échec immédiat de la simulation.
+
 ## Fichiers de configuration
 
 - `parametres.defaut.yaml`: paramètres publics versionnés.
@@ -103,6 +111,7 @@ sorties/
 
 - `registre.csv`:
   - Colonnes: `periode`, `id_module`, `type_module`, `flux_de_tresorerie`, `categorie`, `compte`, `description`.
+  - Convention de signe: flux entrant (revenu) positif, flux sortant (dépense/versement) négatif.
   - Catégories fréquentes: `versement_dca`, `versement_restant`, `loyer`, `charges`, `depenses_courantes`, etc.
   - Le sweep automatique ajoute des lignes avec `categorie=versement_restant`.
 - `synthese_mensuelle.csv`:
@@ -115,6 +124,31 @@ sorties/
 - `rapport.json`:
   - Métriques globales (`solde_final_tresorerie`, `flux_net_cumule`, `flux_cumule_par_module`).
   - Métriques spécifiques modules quand disponibles (ex: intérêts totaux d'emprunt, NOI locatif).
+
+Exports additionnels en mode diagnostic:
+
+- `grand_livre_mensuel.csv`: total des flux, pivot par compte, trésorerie début/fin et états clés (bourse, CRD).
+- `details_emprunt_<id>.csv`: détail mensuel de l'échéancier (CRD début/fin, intérêt, principal, mensualité).
+- `anomalies.csv`: liste des invariants violés.
+
+## Conventions comptables et ordre d'application
+
+- Les modules écrivent uniquement des flux dans le registre.
+- Les états (`capital_restant_du`, `valeur_bourse`, etc.) sont dérivés de manière déterministe.
+- Ordre mensuel ciblé:
+  1. revenus,
+  2. dépenses de vie,
+  3. mensualités emprunt,
+  4. charges locatives,
+  5. investissements (DCA puis investissement du restant).
+
+Invariants vérifiés mensuellement:
+
+- trésorerie non négative,
+- CRD non négatif et monotone,
+- principal d'emprunt non négatif,
+- valeur bourse non négative,
+- détection de doublons de flux (même période/catégorie/description/montant).
 
 ## Exemples de paramétrage
 
