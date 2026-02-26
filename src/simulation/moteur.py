@@ -326,7 +326,7 @@ def executer_simulation_depuis_config(
     etat = EtatSimulation(periode_courante=calendrier[0], cash=config.portefeuille.tresorerie_initiale)
 
     taux_mensuel_restant = (
-        (1 + (config.portefeuille.rendement_annuel_investissement_restant or config.hypotheses.rendement_marche)) ** (1 / 12) - 1
+        (1 + config.hypotheses.rendement_bourse_annuel) ** (1 / 12) - 1
     )
 
     for idx, periode in enumerate(calendrier):
@@ -382,20 +382,23 @@ def executer_simulation_depuis_config(
                     appliquer_flux_cash(etat, -impot)
                     flux_net_mensuel -= impot
 
-        # Loyer de RP si pas propriétaire
+        # Loyer de RP si pas propriétaire (indexé mensuellement)
         if config.portefeuille.loyer_residence_principale > 0 and not etat.possessions.get("possede_rp", False):
+            taux_mensuel_loyer_rp = (1 + config.hypotheses.indexation_loyers_annuelle) ** (1 / 12) - 1
+            mois_ecoules = periode.ordinal - calendrier[0].ordinal
+            loyer_rp = config.portefeuille.loyer_residence_principale * ((1 + taux_mensuel_loyer_rp) ** mois_ecoules)
             ligne_loyer_rp = {
                 "periode": periode,
                 "id_module": "loyer_residence_principale",
                 "type_module": "flux_global",
-                "flux_de_tresorerie": -config.portefeuille.loyer_residence_principale,
+                "flux_de_tresorerie": -loyer_rp,
                 "categorie": "loyer_residence_principale",
                 "compte": "cash",
                 "description": "Loyer résidence principale",
             }
             lignes_registre.append(ligne_loyer_rp)
-            appliquer_flux_cash(etat, -config.portefeuille.loyer_residence_principale)
-            flux_net_mensuel -= config.portefeuille.loyer_residence_principale
+            appliquer_flux_cash(etat, -loyer_rp)
+            flux_net_mensuel -= loyer_rp
 
         # F) Sweep investissement restant
         appliquer_rendement_bourse(etat, taux_mensuel_restant)
@@ -408,7 +411,7 @@ def executer_simulation_depuis_config(
                     "type_module": "investissement_restant",
                     "flux_de_tresorerie": -versement,
                     "categorie": "versement_restant",
-                    "compte": config.portefeuille.compte_investissement_restant,
+                    "compte": "cash",
                     "description": "Versement automatique du restant",
                 }
             )

@@ -18,16 +18,33 @@ class ConfigurationSimulation(BaseModel):
 
 
 class ConfigurationHypotheses(BaseModel):
-    inflation: float = 0.0
-    croissance_salaire: float = 0.0
-    rendement_marche: float = 0.05
+    inflation_annuelle: float = 0.0
+    croissance_salaire_annuelle: float = 0.0
+    indexation_loyers_annuelle: float = 0.0
+    revalorisation_immobiliere_annuelle: float = 0.0
+    rendement_bourse_annuel: float = 0.0
+
+    @model_validator(mode="before")
+    @classmethod
+    def normaliser_cles_legacy(cls, data: object) -> object:
+        if not isinstance(data, dict):
+            return data
+        normalise = dict(data)
+        correspondances = {
+            "inflation": "inflation_annuelle",
+            "croissance_salaire": "croissance_salaire_annuelle",
+            "rendement_marche": "rendement_bourse_annuel",
+        }
+        for cle_legacy, cle_nouvelle in correspondances.items():
+            if cle_legacy in normalise and cle_nouvelle not in normalise:
+                normalise[cle_nouvelle] = normalise.pop(cle_legacy)
+        return normalise
 
 
 class ConfigurationPortefeuille(BaseModel):
     tresorerie_initiale: float = 0.0
     comptes: list[str] = Field(default_factory=lambda: ["cash", "courtier"])
     taux_investissement_restant: float = Field(default=1.0, ge=0.0, le=1.0)
-    rendement_annuel_investissement_restant: float | None = None
     id_module_investissement_restant: str = "investissement_restant"
     compte_investissement_restant: str = "courtier"
     loyer_residence_principale: float = Field(default=0.0, ge=0.0)
@@ -47,7 +64,7 @@ class ConfigurationModuleFluxFixe(ConfigurationModuleBase):
     sens: Literal["revenu", "depense"]
     categorie: str
     compte: str = "cash"
-    indexation: Literal["aucune", "inflation"] = "aucune"
+    indexation: Literal["aucune", "inflation", "croissance_salaire", "indexation_loyer"] = "aucune"
     periode_reference: str | None = None
 
 
@@ -57,7 +74,7 @@ class ConfigurationModuleEmprunt(ConfigurationModuleBase):
     capital: float = Field(gt=0.0)
     taux_annuel: float = Field(ge=0.0)
     duree_mois: PositiveInt
-    assurance_mensuelle: float = Field(default=0.0, ge=0.0)
+    taux_assurance_annuel: float = Field(default=0.0, ge=0.0)
     compte: str = "cash"
 
 
@@ -65,24 +82,24 @@ class ConfigurationEmpruntIntegree(BaseModel):
     capital: float = Field(gt=0.0)
     taux_annuel: float = Field(ge=0.0)
     duree_mois: PositiveInt
-    assurance_mensuelle: float = Field(default=0.0, ge=0.0)
+    taux_assurance_annuel: float = Field(default=0.0, ge=0.0)
 
 
 class ConfigurationModuleImmobilierLocatif(ConfigurationModuleBase):
     type: Literal["immobilier_locatif"]
     date_achat: str
     prix: float = Field(gt=0.0)
-    frais_notaire: float = Field(ge=0.0)
-    budget_travaux: float = Field(default=0.0, ge=0.0)
+    taux_frais_notaire: float = Field(default=0.0, ge=0.0)
+    taux_travaux: float = Field(default=0.0, ge=0.0)
     apport: float = Field(ge=0.0)
     emprunt: ConfigurationEmpruntIntegree
-    loyer_mensuel: float = Field(ge=0.0)
+    loyer_mensuel_initial: float = Field(ge=0.0)
     date_debut_location: str
     taux_vacance: float = Field(default=0.0, ge=0.0, le=1.0)
     charges_mensuelles: float = Field(default=0.0, ge=0.0)
     taxe_fonciere_annuelle: float = Field(default=0.0, ge=0.0)
-    taux_entretien: float = Field(default=0.0, ge=0.0)
-    taux_gestion: float = Field(default=0.0, ge=0.0)
+    taux_entretien_annuel: float = Field(default=0.0, ge=0.0)
+    taux_gestion_locative: float = Field(default=0.0, ge=0.0)
     compte: str = "cash"
 
     @model_validator(mode="after")
@@ -100,7 +117,7 @@ class ConfigurationModuleResidencePrincipale(ConfigurationModuleBase):
     type: Literal["residence_principale"]
     date_achat: str
     prix: float = Field(gt=0.0)
-    frais_notaire: float = Field(ge=0.0)
+    taux_frais_notaire: float = Field(default=0.0, ge=0.0)
     apport: float = Field(ge=0.0)
     emprunt: ConfigurationEmpruntIntegree
     taxe_fonciere_annuelle: float = Field(default=0.0, ge=0.0)

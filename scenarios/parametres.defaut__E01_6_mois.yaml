@@ -4,16 +4,17 @@ simulation:
   devise: EUR
   pas_de_temps: M
 hypotheses:
-  inflation: 0.02
-  croissance_salaire: 0.02
-  rendement_marche: 0.05
+  inflation_annuelle: 0.02
+  croissance_salaire_annuelle: 0.02
+  indexation_loyers_annuelle: 0.02
+  revalorisation_immobiliere_annuelle: 0.01
+  rendement_bourse_annuel: 0.05
 portefeuille:
   tresorerie_initiale: 800000
   comptes:
   - cash
   - courtier
   taux_investissement_restant: 1.0
-  rendement_annuel_investissement_restant: 0.05
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
 modules:
@@ -26,6 +27,7 @@ modules:
   sens: revenu
   categorie: salaire
   compte: cash
+  indexation: croissance_salaire
 - id: depenses_vie
   type: flux_fixe
   montant: 200

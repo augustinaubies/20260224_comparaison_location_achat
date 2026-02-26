@@ -153,16 +153,8 @@ def calculer_metriques(
             },
             "immobilier": {
                 "charges_totales": _somme_flux(registre_df, "charges", "negatif") + _somme_flux(registre_df, "taxe_fonciere", "negatif"),
-                "entretien_total": sum(
-                    float(etats.get("loyers_bruts", pd.Series(dtype=float)).sum()) * float(getattr(module, "taux_entretien", 0.0))
-                    for module, etats in ((m, etats_par_module.get(m.id, {})) for m in config.modules if m.type == "immobilier_locatif")
-                    if isinstance(etats.get("loyers_bruts"), pd.Series)
-                ),
-                "gestion_total": sum(
-                    float(etats.get("loyers_bruts", pd.Series(dtype=float)).sum()) * float(getattr(module, "taux_gestion", 0.0))
-                    for module, etats in ((m, etats_par_module.get(m.id, {})) for m in config.modules if m.type == "immobilier_locatif")
-                    if isinstance(etats.get("loyers_bruts"), pd.Series)
-                ),
+                "entretien_total": _somme_flux(registre_df, "entretien", "negatif"),
+                "gestion_total": _somme_flux(registre_df, "gestion_locative", "negatif"),
             },
             "bourse": {
                 "versements_totaux": versements_bourse,

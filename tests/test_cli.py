@@ -16,8 +16,8 @@ simulation:
   date_debut: "2025-01"
   date_fin: "2025-02"
 hypotheses:
-  inflation: 0.02
-  rendement_marche: 0.05
+  inflation_annuelle: 0.02
+  rendement_bourse_annuel: 0.05
 portefeuille:
   tresorerie_initiale: 1000
   comptes: ["cash", "courtier"]
@@ -78,7 +78,7 @@ def test_cli_absence_parametres_utilisateur_nest_pas_une_erreur(
     resultat = CliRunner().invoke(application, [])
 
     assert resultat.exit_code == 0
-    assert "utilisation des défauts uniquement" in resultat.stdout
+    assert "Statut: OK" in resultat.stdout
 
 
 def test_fusion_configuration_utilisateur_ecrase_defaut(tmp_path: Path) -> None:
@@ -90,7 +90,7 @@ simulation:
   date_debut: "2025-01"
   date_fin: "2025-01"
 hypotheses:
-  inflation: 0.02
+  inflation_annuelle: 0.02
 portefeuille:
   tresorerie_initiale: 1000
   comptes: ["cash", "courtier"]
@@ -110,4 +110,4 @@ portefeuille:
 
     assert config.portefeuille.tresorerie_initiale == 2500
     assert config.portefeuille.comptes == ["cash", "courtier"]
-    assert config.hypotheses.inflation == 0.02
+    assert config.hypotheses.inflation_annuelle == 0.02

@@ -21,7 +21,7 @@ def test_flux_fixe_non_indexe_constant() -> None:
     )
     contexte = ContexteSimulation(
         calendrier=pd.period_range("2025-01", "2025-03", freq="M"),
-        hypotheses={"inflation": 0.12},
+        hypotheses={"inflation_annuelle": 0.12},
         comptes=["cash"],
     )
 
@@ -43,7 +43,7 @@ def test_flux_fixe_indexation_inflation() -> None:
     calendrier = pd.period_range("2025-01", "2025-03", freq="M")
     contexte = ContexteSimulation(
         calendrier=calendrier,
-        hypotheses={"inflation": 0.12},
+        hypotheses={"inflation_annuelle": 0.12},
         comptes=["cash"],
     )
 

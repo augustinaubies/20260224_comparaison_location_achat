@@ -4,16 +4,17 @@ simulation:
   devise: EUR
   pas_de_temps: M
 hypotheses:
-  inflation: 0.02
-  croissance_salaire: 0.02
-  rendement_marche: 0.05
+  inflation_annuelle: 0.02
+  croissance_salaire_annuelle: 0.02
+  indexation_loyers_annuelle: 0.02
+  revalorisation_immobiliere_annuelle: 0.01
+  rendement_bourse_annuel: 0.05
 portefeuille:
   tresorerie_initiale: 800000
   comptes:
   - cash
   - courtier
   taux_investissement_restant: 1.0
-  rendement_annuel_investissement_restant: 0.05
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
 modules:
@@ -26,6 +27,7 @@ modules:
   sens: revenu
   categorie: salaire
   compte: cash
+  indexation: croissance_salaire
 - id: depenses_vie
   type: flux_fixe
   montant: 200
@@ -43,19 +45,19 @@ modules:
   type: immobilier_locatif
   date_achat: 2029-12
   prix: 220000
-  frais_notaire: 17000
-  budget_travaux: 8000
   apport: 45000
   emprunt:
     capital: 210000
     taux_annuel: 0.052
     duree_mois: 180
-    assurance_mensuelle: 35
-  loyer_mensuel: 980
+    taux_assurance_annuel: 0.002
   date_debut_location: 2030-02
   taux_vacance: 0.05
   charges_mensuelles: 120
   taxe_fonciere_annuelle: 1100
-  taux_entretien: 0.03
-  taux_gestion: 0.05
   compte: cash
+  taux_frais_notaire: 0.07727272727272727
+  taux_travaux: 0.03636363636363636
+  loyer_mensuel_initial: 980
+  taux_entretien_annuel: 0.03
+  taux_gestion_locative: 0.05

@@ -15,7 +15,7 @@ def test_emprunt_amortissement_et_capital_restant() -> None:
         capital=12000,
         taux_annuel=0.03,
         duree_mois=24,
-        assurance_mensuelle=0,
+        taux_assurance_annuel=0,
         compte="cash",
     )
     contexte = ContexteSimulation(

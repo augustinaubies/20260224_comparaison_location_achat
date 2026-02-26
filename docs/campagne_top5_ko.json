@@ -1,362 +1,514 @@
 [
   {
-    "scenario": "E11_salaire_nul_periode",
+    "scenario": "E12_depenses_sup_salaire",
     "statut": "OK",
-    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E11_salaire_nul_periode.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E11_salaire_nul_periode",
-    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E11_\nsalaire_nul_periode.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E11_salaire_nul_\nperiode\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -25322.32 │\n│ Flux net cumulé        │ -825322.32 │\n└────────────────────────┴────────────┘\nStatut: OK",
-    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:67: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E12_depenses_sup_salaire.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E12_depenses_sup_salaire --csv",
+    "stdout": "Patrimoine final         \n┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓\n┃ Categorie  ┃          Montant ┃\n┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩\n│ Cash       │  -550 944.41 EUR │\n│ Bourse     │ 1 499 581.36 EUR │\n│ Immobilier │         0.00 EUR │\n│ Dettes     │        -0.00 EUR │\n├────────────┼──────────────────┤\n│ Total      │   948 636.95 EUR │\n└────────────┴──────────────────┘\nStatut: OK",
+    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:73: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
     "analyse": {
-      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E11_salaire_nul_periode",
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E12_depenses_sup_salaire",
       "verdict": "KO",
-      "solde_final_tresorerie_rapport": -25322.315417683752,
-      "solde_final_cash_recalcule": 935537.9918057269,
-      "mois_rupture_tresorerie": null,
+      "solde_final_tresorerie_rapport": -550944.4055840318,
+      "solde_final_cash_recalcule": -550944.4055840318,
+      "mois_rupture_tresorerie": "2025-02",
       "anomalies": [
-        "Synthèse trésorerie incohérente avec flux cash (écart max en 2032-12)"
+        "Trésorerie cash négative dès 2025-02"
       ],
       "top_flux_negatifs": [
         {
           "categorie": "versement_restant",
           "id_module": "investissement_restant",
-          "montant_cumule": -960860.3072234107
+          "montant_cumule": -798500.0
         },
         {
           "categorie": "depenses_courantes",
           "id_module": "depenses_vie",
-          "montant_cumule": -35554.60819427308
+          "montant_cumule": -622205.6433997813
         },
         {
           "categorie": "impot_sur_le_revenu",
           "id_module": "fiscalite",
-          "montant_cumule": -24507.399999999998
-        }
-      ],
-      "top_flux_positifs": [
-        {
-          "categorie": "salaire",
-          "id_module": "salaire_phase3",
-          "montant_cumule": 118800.0
-        },
-        {
-          "categorie": "salaire",
-          "id_module": "salaire_phase1",
-          "montant_cumule": 76800.0
-        }
-      ],
-      "doublons_suspects": [],
-      "emprunts": [],
-      "investissements": {
-        "flux_bourse_cumules": -960860.3072234107,
-        "valeurs": [
-          {
-            "fichier": "etats_module_investissement_restant_valeur_bourse.csv",
-            "min": 803000.0,
-            "max": 1764626.3521366485
-          }
-        ],
-        "incoherences": []
-      },
-      "sanity_stats_flux": {
-        "count": 276.0,
-        "mean": -2990.2982442669704,
-        "std": 48376.53577910155,
-        "min": -803000.0,
-        "1%": -5045.48,
-        "50%": -227.2861224055,
-        "99%": 3300.0,
-        "max": 3300.0
-      }
-    }
-  },
-  {
-    "scenario": "E06_inflation_negative",
-    "statut": "OK",
-    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E06_inflation_negative.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E06_inflation_negative",
-    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E06_\ninflation_negative.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E06_inflation_ne\ngative\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -24435.76 │\n│ Flux net cumulé        │ -824435.76 │\n└────────────────────────┴────────────┘\nStatut: OK",
-    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:67: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
-    "analyse": {
-      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E06_inflation_negative",
-      "verdict": "KO",
-      "solde_final_tresorerie_rapport": -24435.755894216094,
-      "solde_final_cash_recalcule": 868641.2488702177,
-      "mois_rupture_tresorerie": null,
-      "anomalies": [
-        "Synthèse trésorerie incohérente avec flux cash (écart max en 2027-12)"
-      ],
-      "top_flux_negatifs": [
-        {
-          "categorie": "versement_restant",
-          "id_module": "investissement_restant",
-          "montant_cumule": -893077.0047644338
-        },
-        {
-          "categorie": "depenses_courantes",
-          "id_module": "depenses_vie",
-          "montant_cumule": -27462.311129782218
-        },
-        {
-          "categorie": "impot_sur_le_revenu",
-          "id_module": "fiscalite",
-          "montant_cumule": -11896.44
+          "montant_cumule": -4359.242876103854
         }
       ],
       "top_flux_positifs": [
         {
           "categorie": "salaire",
           "id_module": "salaire",
-          "montant_cumule": 108000.0
+          "montant_cumule": 74120.48069185321
         }
       ],
       "doublons_suspects": [],
       "emprunts": [],
       "investissements": {
-        "flux_bourse_cumules": -893077.0047644338,
+        "flux_bourse_cumules": 0.0,
         "valeurs": [
           {
-            "fichier": "etats_module_investissement_restant_valeur_bourse.csv",
-            "min": 802800.0,
-            "max": 1665823.2972962942
+            "fichier": "etats_module_module_1_valeur_bourse.csv",
+            "min": 798500.0,
+            "max": 1499581.3600605773
           }
         ],
         "incoherences": []
       },
       "sanity_stats_flux": {
-        "count": 229.0,
-        "mean": -3600.1561392760523,
-        "std": 53070.0153411623,
-        "min": -802800.0,
-        "1%": -3965.48,
-        "50%": -175.68336774868243,
-        "99%": 3000.0,
-        "max": 3000.0
+        "count": 196.0,
+        "mean": -6892.573497877713,
+        "std": 56882.47505241777,
+        "min": -798500.0,
+        "1%": -4513.0773547185245,
+        "50%": -3854.7305832788215,
+        "99%": 2112.1090146143506,
+        "max": 2118.91643723194
       }
     }
   },
   {
-    "scenario": "E04_inflation_zero",
+    "scenario": "E05_inflation_10",
     "statut": "OK",
-    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E04_inflation_zero.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E04_inflation_zero",
-    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E04_\ninflation_zero.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E04_inflation_ze\nro\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -27965.48 │\n│ Flux net cumulé        │ -827965.48 │\n└────────────────────────┴────────────┘\nStatut: OK",
-    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:67: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E05_inflation_10.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E05_inflation_10 --csv",
+    "stdout": "Patrimoine final         \n┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓\n┃ Categorie  ┃          Montant ┃\n┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩\n│ Cash       │  -403 532.62 EUR │\n│ Bourse     │ 1 574 238.44 EUR │\n│ Immobilier │   220 000.00 EUR │\n│ Dettes     │        -0.00 EUR │\n├────────────┼──────────────────┤\n│ Total      │ 1 390 705.82 EUR │\n└────────────┴──────────────────┘\nStatut: OK",
+    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:73: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
     "analyse": {
-      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E04_inflation_zero",
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E05_inflation_10",
       "verdict": "KO",
-      "solde_final_tresorerie_rapport": -27965.48,
-      "solde_final_cash_recalcule": 864903.56,
-      "mois_rupture_tresorerie": null,
+      "solde_final_tresorerie_rapport": -403532.62125956255,
+      "solde_final_cash_recalcule": -403532.62125956255,
+      "mois_rupture_tresorerie": "2026-09",
       "anomalies": [
-        "Synthèse trésorerie incohérente avec flux cash (écart max en 2027-12)"
+        "Trésorerie cash négative dès 2026-09"
       ],
       "top_flux_negatifs": [
         {
           "categorie": "versement_restant",
           "id_module": "investissement_restant",
-          "montant_cumule": -892869.04
+          "montant_cumule": -840570.7317765497
         },
         {
           "categorie": "depenses_courantes",
           "id_module": "depenses_vie",
-          "montant_cumule": -31200.0
+          "montant_cumule": -461291.9542094587
         },
         {
           "categorie": "impot_sur_le_revenu",
           "id_module": "fiscalite",
-          "montant_cumule": -11896.44
+          "montant_cumule": -12850.656311333945
         }
       ],
       "top_flux_positifs": [
         {
           "categorie": "salaire",
           "id_module": "salaire",
-          "montant_cumule": 108000.0
+          "montant_cumule": 111180.72103777982
         }
       ],
       "doublons_suspects": [],
-      "emprunts": [],
+      "emprunts": [
+        {
+          "module": "module_2",
+          "crd_min": 0.0,
+          "mois_crd_min": "2025-01",
+          "delta_crd_max": 0.0,
+          "delta_crd_min": 0.0,
+          "crd_final": 0.0,
+          "maturite_theorique": null,
+          "anomalies": []
+        }
+      ],
       "investissements": {
-        "flux_bourse_cumules": -892869.04,
+        "flux_bourse_cumules": 0.0,
         "valeurs": [
           {
-            "fichier": "etats_module_investissement_restant_valeur_bourse.csv",
-            "min": 802800.0,
-            "max": 1665468.3948443043
+            "fichier": "etats_module_module_1_valeur_bourse.csv",
+            "min": 801500.0,
+            "max": 1574238.441757421
           }
         ],
         "incoherences": []
       },
       "sanity_stats_flux": {
-        "count": 229.0,
-        "mean": -3615.5697816593884,
-        "std": 53068.97495515865,
-        "min": -802800.0,
-        "1%": -3965.48,
-        "50%": -200.0,
-        "99%": 3000.0,
-        "max": 3000.0
+        "count": 225.0,
+        "mean": -5349.033872264723,
+        "std": 53366.60611946517,
+        "min": -801500.0,
+        "1%": -5087.120519865477,
+        "50%": -2178.7761331511115,
+        "99%": 3166.6482985812418,
+        "max": 3178.37465584791
       }
     }
   },
   {
-    "scenario": "B01_bug2030_derniere_echeance",
+    "scenario": "E13_loyer_nul_vacance_100",
     "statut": "OK",
-    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B01_bug2030_derniere_echeance.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/B01_bug2030_derniere_echeance",
-    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B01_\nbug2030_derniere_echeance.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/B01_bug2030_dern\niere_echeance\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │       0.00 │\n│ Flux net cumulé        │ -800000.00 │\n└────────────────────────┴────────────┘\nStatut: OK",
-    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:67: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E13_loyer_nul_vacance_100.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E13_loyer_nul_vacance_100 --csv",
+    "stdout": "Patrimoine final         \n┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓\n┃ Categorie  ┃          Montant ┃\n┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩\n│ Cash       │  -295 743.40 EUR │\n│ Bourse     │ 1 507 656.75 EUR │\n│ Immobilier │   220 000.00 EUR │\n│ Dettes     │   -76 308.79 EUR │\n├────────────┼──────────────────┤\n│ Total      │ 1 355 604.56 EUR │\n└────────────┴──────────────────┘\nStatut: OK",
+    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:73: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
     "analyse": {
-      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/B01_bug2030_derniere_echeance",
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E13_loyer_nul_vacance_100",
       "verdict": "KO",
-      "solde_final_tresorerie_rapport": 0.0,
-      "solde_final_cash_recalcule": 864723.6852665533,
-      "mois_rupture_tresorerie": null,
+      "solde_final_tresorerie_rapport": -295743.397921374,
+      "solde_final_cash_recalcule": -295743.39792137395,
+      "mois_rupture_tresorerie": "2025-02",
       "anomalies": [
-        "Synthèse trésorerie incohérente avec flux cash (écart max en 2037-12)"
+        "Trésorerie cash négative dès 2025-02",
+        "CRD augmente en 2025-02"
       ],
       "top_flux_negatifs": [
         {
           "categorie": "versement_restant",
           "id_module": "investissement_restant",
-          "montant_cumule": -864723.685266554
+          "montant_cumule": -802800.0
         },
         {
           "categorie": "echeance_emprunt",
           "id_module": "locatif_lyon",
-          "montant_cumule": -100703.8665391729
+          "montant_cumule": -157314.07350291364
+        },
+        {
+          "categorie": "entretien",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -90383.1142839662
+        },
+        {
+          "categorie": "apport",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -45000.0
         },
         {
           "categorie": "depenses_courantes",
           "id_module": "depenses_vie",
-          "montant_cumule": -35554.60819427308
+          "montant_cumule": -35554.60819427322
         },
         {
           "categorie": "charges",
           "id_module": "locatif_lyon",
-          "montant_cumule": -18720.0
+          "montant_cumule": -18480.0
         },
         {
-          "categorie": "impot_sur_le_revenu",
-          "id_module": "fiscalite",
-          "montant_cumule": -16923.84
+          "categorie": "frais_notaire",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -17000.0
         },
         {
           "categorie": "taxe_fonciere",
           "id_module": "locatif_lyon",
-          "montant_cumule": -14300.000000000004
+          "montant_cumule": -14116.66666666667
+        },
+        {
+          "categorie": "impot_sur_le_revenu",
+          "id_module": "fiscalite",
+          "montant_cumule": -12850.656311333945
+        },
+        {
+          "categorie": "travaux",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -8000.0
         },
         {
           "categorie": "assurance_emprunt",
           "id_module": "locatif_lyon",
-          "montant_cumule": -2310.0
+          "montant_cumule": -5424.999999999999
+        }
+      ],
+      "top_flux_positifs": [
+        {
+          "categorie": "salaire",
+          "id_module": "salaire",
+          "montant_cumule": 111180.72103777982
+        }
+      ],
+      "doublons_suspects": [],
+      "emprunts": [
+        {
+          "module": "module_2",
+          "crd_min": 0.0,
+          "mois_crd_min": "2025-01",
+          "delta_crd_max": 174495.48716019627,
+          "delta_crd_min": -790.0578675689612,
+          "crd_final": 76308.7897557853,
+          "maturite_theorique": null,
+          "anomalies": [
+            "CRD augmente en 2025-02"
+          ]
+        }
+      ],
+      "investissements": {
+        "flux_bourse_cumules": 0.0,
+        "valeurs": [
+          {
+            "fichier": "etats_module_module_1_valeur_bourse.csv",
+            "min": 802800.0,
+            "max": 1507656.751229345
+          }
+        ],
+        "incoherences": []
+      },
+      "sanity_stats_flux": {
+        "count": 1279.0,
+        "mean": -856.718841220777,
+        "std": 22492.397187831783,
+        "min": -802800.0,
+        "1%": -1014.9295064704106,
+        "50%": -91.66666666666669,
+        "99%": 3112.0459986662886,
+        "max": 3178.37465584791
+      }
+    }
+  },
+  {
+    "scenario": "E02_40_ans",
+    "statut": "OK",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E02_40_ans.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E02_40_ans --csv",
+    "stdout": "Patrimoine final         \n┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓\n┃ Categorie  ┃          Montant ┃\n┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩\n│ Cash       │  -277 627.08 EUR │\n│ Bourse     │ 6 343 283.53 EUR │\n│ Immobilier │   220 000.00 EUR │\n│ Dettes     │        -0.00 EUR │\n├────────────┼──────────────────┤\n│ Total      │ 6 285 656.45 EUR │\n└────────────┴──────────────────┘\nStatut: OK",
+    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:73: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
+    "analyse": {
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E02_40_ans",
+      "verdict": "KO",
+      "solde_final_tresorerie_rapport": -277627.08301163255,
+      "solde_final_cash_recalcule": -277627.08301163063,
+      "mois_rupture_tresorerie": "2026-09",
+      "anomalies": [
+        "Trésorerie cash négative dès 2026-09",
+        "CRD augmente en 2027-01"
+      ],
+      "top_flux_negatifs": [
+        {
+          "categorie": "versement_restant",
+          "id_module": "investissement_restant",
+          "montant_cumule": -864427.8094671373
+        },
+        {
+          "categorie": "entretien",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -312701.1303854377
+        },
+        {
+          "categorie": "echeance_emprunt",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -282898.15331956017
+        },
+        {
+          "categorie": "depenses_courantes",
+          "id_module": "depenses_vie",
+          "montant_cumule": -151636.55042973944
+        },
+        {
+          "categorie": "charges",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -55800.0
+        },
+        {
+          "categorie": "apport",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -45000.0
+        },
+        {
+          "categorie": "taxe_fonciere",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -42625.00000000001
+        },
+        {
+          "categorie": "gestion_locative",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -32527.14816264923
+        },
+        {
+          "categorie": "frais_notaire",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -17000.0
+        },
+        {
+          "categorie": "impot_sur_le_revenu",
+          "id_module": "fiscalite",
+          "montant_cumule": -14134.975537871302
+        },
+        {
+          "categorie": "assurance_emprunt",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -12599.999999999998
+        },
+        {
+          "categorie": "travaux",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -8000.0
         }
       ],
       "top_flux_positifs": [
         {
           "categorie": "loyer",
           "id_module": "locatif_lyon",
-          "montant_cumule": 145236.0
+          "montant_cumule": 650542.9632529846
         },
         {
           "categorie": "salaire",
           "id_module": "salaire",
-          "montant_cumule": 108000.0
+          "montant_cumule": 111180.72103777982
         }
       ],
       "doublons_suspects": [],
       "emprunts": [
         {
-          "module": "locatif_lyon",
+          "module": "module_2",
           "crd_min": 0.0,
-          "mois_crd_min": "2030-06",
-          "delta_crd_max": 0.0,
-          "delta_crd_min": -1520.6207056047376,
+          "mois_crd_min": "2025-01",
+          "delta_crd_max": 174724.58846300122,
+          "delta_crd_min": -783.5428702951108,
           "crd_final": 0.0,
-          "maturite_theorique": "2030-06",
-          "anomalies": []
+          "maturite_theorique": null,
+          "anomalies": [
+            "CRD augmente en 2027-01"
+          ]
         }
       ],
       "investissements": {
-        "flux_bourse_cumules": -864723.6852665541,
+        "flux_bourse_cumules": 0.0,
         "valeurs": [
           {
-            "fichier": "etats_module_investissement_restant_valeur_bourse.csv",
-            "min": 801958.5171736489,
-            "max": 1612315.33442227
+            "fichier": "etats_module_module_1_valeur_bourse.csv",
+            "min": 802800.0,
+            "max": 6343283.52933348
           }
         ],
         "incoherences": []
       },
       "sanity_stats_flux": {
-        "count": 840.0,
-        "mean": -952.3809523809524,
-        "std": 27688.222370903306,
-        "min": -801958.5171736489,
-        "1%": -1956.7302372153895,
+        "count": 3603.0,
+        "mean": -299.0916133809689,
+        "std": 13418.696745914245,
+        "min": -802800.0,
+        "1%": -805.3935584624512,
         "50%": -120.0,
-        "99%": 3000.0,
-        "max": 3000.0
+        "99%": 2002.0519094943409,
+        "max": 3178.37465584791
       }
     }
   },
   {
-    "scenario": "E07_rendement_zero",
+    "scenario": "B03_bug2030_decalage_debut",
     "statut": "OK",
-    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E07_rendement_zero.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/E07_rendement_zero",
-    "stdout": "Paramètres par défaut : \n/workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__E07_\nrendement_zero.yaml\nParamètres utilisateur : absent \n(/workspace/20260224_comparaison_location_achat/parametres.utilisateur.yaml), \nutilisation des défauts uniquement\nDossier de sortie : \n/workspace/20260224_comparaison_location_achat/sorties/campagne/E07_rendement_ze\nro\n          Simulation terminée          \n┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓\n┃ Métrique               ┃     Valeur ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩\n│ Solde final trésorerie │  -32108.04 │\n│ Flux net cumulé        │ -832108.04 │\n└────────────────────────┴────────────┘\nStatut: OK",
-    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:67: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
+    "commande": "python -m src.simulation.cli --parametres-defaut /workspace/20260224_comparaison_location_achat/scenarios/parametres.defaut__B03_bug2030_decalage_debut.yaml --sortie /workspace/20260224_comparaison_location_achat/sorties/campagne/B03_bug2030_decalage_debut --csv",
+    "stdout": "Patrimoine final         \n┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓\n┃ Categorie  ┃          Montant ┃\n┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩\n│ Cash       │  -252 903.95 EUR │\n│ Bourse     │ 1 669 842.11 EUR │\n│ Immobilier │   220 000.00 EUR │\n│ Dettes     │  -117 090.90 EUR │\n├────────────┼──────────────────┤\n│ Total      │ 1 519 847.26 EUR │\n└────────────┴──────────────────┘\nStatut: OK",
+    "stderr": "/workspace/20260224_comparaison_location_achat/src/simulation/cli.py:73: UserWarning: Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.\n  config = charger_configuration(chemin_defaut, chemin_utilisateur)",
     "analyse": {
-      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/E07_rendement_zero",
+      "dossier": "/workspace/20260224_comparaison_location_achat/sorties/campagne/B03_bug2030_decalage_debut",
       "verdict": "KO",
-      "solde_final_tresorerie_rapport": -32108.04012508776,
-      "solde_final_cash_recalcule": 860548.9518057269,
-      "mois_rupture_tresorerie": null,
+      "solde_final_tresorerie_rapport": -252903.9488960681,
+      "solde_final_cash_recalcule": -252903.9488960694,
+      "mois_rupture_tresorerie": "2026-09",
       "anomalies": [
-        "Synthèse trésorerie incohérente avec flux cash (écart max en 2034-03)"
+        "Trésorerie cash négative dès 2026-09",
+        "CRD augmente en 2029-12"
       ],
       "top_flux_negatifs": [
         {
           "categorie": "versement_restant",
           "id_module": "investissement_restant",
-          "montant_cumule": -892656.9919308147
+          "montant_cumule": -895422.447987254
+        },
+        {
+          "categorie": "echeance_emprunt",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -163214.85760988912
+        },
+        {
+          "categorie": "entretien",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -54430.73189248668
+        },
+        {
+          "categorie": "apport",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -45000.0
         },
         {
           "categorie": "depenses_courantes",
           "id_module": "depenses_vie",
-          "montant_cumule": -35554.60819427308
+          "montant_cumule": -35554.60819427322
+        },
+        {
+          "categorie": "frais_notaire",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -17000.0
         },
         {
           "categorie": "impot_sur_le_revenu",
           "id_module": "fiscalite",
-          "montant_cumule": -11896.44
+          "montant_cumule": -12850.656311333945
+        },
+        {
+          "categorie": "charges",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -11400.0
+        },
+        {
+          "categorie": "taxe_fonciere",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -8708.333333333336
+        },
+        {
+          "categorie": "travaux",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -8000.0
+        },
+        {
+          "categorie": "gestion_locative",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -4783.787652353741
+        },
+        {
+          "categorie": "assurance_emprunt",
+          "id_module": "locatif_lyon",
+          "montant_cumule": -3395.0
         }
       ],
       "top_flux_positifs": [
         {
           "categorie": "salaire",
           "id_module": "salaire",
-          "montant_cumule": 108000.0
+          "montant_cumule": 111180.72103777982
+        },
+        {
+          "categorie": "loyer",
+          "id_module": "locatif_lyon",
+          "montant_cumule": 95675.75304707482
         }
       ],
       "doublons_suspects": [],
-      "emprunts": [],
+      "emprunts": [
+        {
+          "module": "module_2",
+          "crd_min": 0.0,
+          "mois_crd_min": "2025-01",
+          "delta_crd_max": 209227.3726019599,
+          "delta_crd_min": -1170.1628121761605,
+          "crd_final": 117090.895464121,
+          "maturite_theorique": null,
+          "anomalies": [
+            "CRD augmente en 2029-12"
+          ]
+        }
+      ],
       "investissements": {
-        "flux_bourse_cumules": -892656.9919308146,
+        "flux_bourse_cumules": 0.0,
         "valeurs": [
           {
-            "fichier": "etats_module_investissement_restant_valeur_bourse.csv",
+            "fichier": "etats_module_module_1_valeur_bourse.csv",
             "min": 802800.0,
-            "max": 892656.9919308145
+            "max": 1669842.108336843
           }
         ],
         "incoherences": []
       },
       "sanity_stats_flux": {
-        "count": 229.0,
-        "mean": -3633.659563865013,
-        "std": 53067.76730048442,
+        "count": 901.0,
+        "mean": -1168.5948378424746,
+        "std": 26806.090712942674,
         "min": -802800.0,
-        "1%": -3965.48,
-        "50%": -227.4736582950911,
-        "99%": 3000.0,
-        "max": 3000.0
+        "1%": -2946.966111484856,
+        "50%": -120.0,
+        "99%": 3131.518344881262,
+        "max": 3178.37465584791
       }
     }
   }

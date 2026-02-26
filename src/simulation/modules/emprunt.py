@@ -88,13 +88,14 @@ class ModuleEmprunt(ModuleSimulation):
                     "description": "Mensualité emprunt",
                 }
             )
-            if self.config.assurance_mensuelle > 0:
+            assurance_mensuelle = self.config.capital * self.config.taux_assurance_annuel / 12
+            if assurance_mensuelle > 0:
                 lignes.append(
                     {
                         "periode": ligne["periode"],
                         "id_module": self.id_module,
                         "type_module": self.type_module,
-                        "flux_de_tresorerie": -self.config.assurance_mensuelle,
+                        "flux_de_tresorerie": -assurance_mensuelle,
                         "categorie": "assurance_emprunt",
                         "compte": self.config.compte,
                         "description": "Assurance emprunt",

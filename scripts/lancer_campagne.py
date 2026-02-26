@@ -25,6 +25,7 @@ def executer() -> None:
             'python', '-m', 'src.simulation.cli',
             '--parametres-defaut', str(scenario),
             '--sortie', str(dossier),
+            '--csv',
         ]
         proc = subprocess.run(commande, cwd=RACINE, capture_output=True, text=True)
         statut = 'OK' if proc.returncode == 0 else 'ERREUR'

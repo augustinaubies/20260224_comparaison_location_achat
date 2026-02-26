@@ -4,16 +4,17 @@ simulation:
   devise: EUR
   pas_de_temps: M
 hypotheses:
-  inflation: 0.02
-  croissance_salaire: 0.02
-  rendement_marche: 0.05
+  inflation_annuelle: 0.02
+  croissance_salaire_annuelle: 0.02
+  indexation_loyers_annuelle: 0.02
+  revalorisation_immobiliere_annuelle: 0.01
+  rendement_bourse_annuel: 0.05
 portefeuille:
   tresorerie_initiale: 1500000
   comptes:
   - cash
   - courtier
   taux_investissement_restant: 0.0
-  rendement_annuel_investissement_restant: 0.05
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
   loyer_residence_principale: 1200
@@ -27,6 +28,7 @@ modules:
   sens: revenu
   categorie: salaire
   compte: cash
+  indexation: croissance_salaire
 - id: depenses_vie
   type: flux_fixe
   montant: 200
@@ -39,32 +41,32 @@ modules:
   type: immobilier_locatif
   date_achat: 2028-06
   prix: 220000
-  frais_notaire: 17000
-  budget_travaux: 8000
   apport: 45000
   emprunt:
     capital: 175000
     taux_annuel: 0.035
     duree_mois: 180
-    assurance_mensuelle: 35
-  loyer_mensuel: 980
+    taux_assurance_annuel: 0.0024
   date_debut_location: 2028-09
   taux_vacance: 0.05
   charges_mensuelles: 120
   taxe_fonciere_annuelle: 1100
-  taux_entretien: 0.03
-  taux_gestion: 0.05
   compte: cash
+  taux_frais_notaire: 0.07727272727272727
+  taux_travaux: 0.03636363636363636
+  loyer_mensuel_initial: 980
+  taux_entretien_annuel: 0.03
+  taux_gestion_locative: 0.05
 - id: rp
   type: residence_principale
   date_achat: 2025-01
   prix: 260000
-  frais_notaire: 18000
   apport: 40000
   emprunt:
     capital: 220000
     taux_annuel: 0.028
     duree_mois: 240
-    assurance_mensuelle: 30
+    taux_assurance_annuel: 0.0016363636363636363
   taxe_fonciere_annuelle: 1200
   compte: cash
+  taux_frais_notaire: 0.06923076923076923
