@@ -35,7 +35,7 @@ modules:
   categorie: depenses_courantes
   compte: cash
   indexation: inflation
-- id: locatif_lyon
+- id: locatif_1
   type: immobilier_locatif
   date_achat: 2070-03
   prix: 220000

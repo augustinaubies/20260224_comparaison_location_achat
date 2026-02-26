@@ -179,18 +179,20 @@ def _calculer_synthese_stateful(lignes_synthese: list[dict]) -> pd.DataFrame:
     return df[["periode", "flux_net", "solde_tresorerie", "tresorerie_debut", "tresorerie_fin", "valeur_bourse_fin"]]
 
 
-def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path) -> None:
+def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path, generer_csv: bool = False) -> None:
     dossier_sortie.mkdir(parents=True, exist_ok=True)
-    resultat.registre_df.to_csv(dossier_sortie / "registre.csv", index=False)
-    resultat.synthese_df.to_csv(dossier_sortie / "synthese_mensuelle.csv", index=False)
-    for id_module, etats in resultat.etats_par_module.items():
-        for nom_etat, serie_ou_df in etats.items():
-            if isinstance(serie_ou_df, pd.Series):
-                etat_df = serie_ou_df.reset_index()
-                etat_df.columns = ["periode", nom_etat]
-            else:
-                etat_df = serie_ou_df.reset_index()
-            etat_df.to_csv(dossier_sortie / f"etats_module_{id_module}_{nom_etat}.csv", index=False)
+    if generer_csv:
+        resultat.registre_df.to_csv(dossier_sortie / "registre.csv", index=False)
+        resultat.synthese_df.to_csv(dossier_sortie / "synthese_mensuelle.csv", index=False)
+        ids_csv = {id_module: f"module_{idx}" for idx, id_module in enumerate(sorted(resultat.etats_par_module.keys()), start=1)}
+        for id_module, etats in resultat.etats_par_module.items():
+            for nom_etat, serie_ou_df in etats.items():
+                if isinstance(serie_ou_df, pd.Series):
+                    etat_df = serie_ou_df.reset_index()
+                    etat_df.columns = ["periode", nom_etat]
+                else:
+                    etat_df = serie_ou_df.reset_index()
+                etat_df.to_csv(dossier_sortie / f"etats_module_{ids_csv[id_module]}_{nom_etat}.csv", index=False)
 
     with (dossier_sortie / "rapport.json").open("w", encoding="utf-8") as fichier:
         json.dump(resultat.metriques, fichier, ensure_ascii=False, indent=2)
@@ -284,6 +286,7 @@ def executer_simulation_depuis_config(
     config: ConfigurationRacine,
     dossier_sortie: Path,
     options_diagnostic: OptionsDiagnostic | None = None,
+    generer_csv: bool = False,
 ) -> ResultatSimulation:
     """Moteur mensuel stateful.
 
@@ -432,7 +435,7 @@ def executer_simulation_depuis_config(
     etats_par_module = _construire_etat_module_series(valeurs_etat_modules)
     synthese_df = _calculer_synthese_stateful(lignes_synthese)
 
-    metriques = calculer_metriques(registre_df, synthese_df, etats_par_module)
+    metriques = calculer_metriques(registre_df, synthese_df, etats_par_module, config)
     anomalies = verifier_invariants(
         calendrier=calendrier,
         registre_df=registre_df,
@@ -449,7 +452,7 @@ def executer_simulation_depuis_config(
         metriques=metriques,
         etats_par_module=etats_par_module,
     )
-    exporter_resultats(resultat, dossier_sortie)
+    exporter_resultats(resultat, dossier_sortie, generer_csv=generer_csv)
     if options.actif:
         exporter_diagnostic(
             dossier_sortie=dossier_sortie,

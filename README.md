@@ -49,6 +49,8 @@ python -m simulation.cli \
 
 > Si `--sortie` est fourni, la CLI écrit directement dans ce dossier (sans sous-dossier horodaté).
 
+Par défaut, la simulation écrit uniquement `rapport.json` dans le dossier de sortie. Pour conserver les exports historiques (`registre.csv`, `synthese_mensuelle.csv`, `etats_module_*.csv`), activez explicitement l'option `--csv`.
+
 Mode diagnostic (invariants stricts + exports de debug):
 
 ```bash
@@ -104,11 +106,10 @@ Arborescence par défaut:
 ```text
 sorties/
   2026-02-24_154501/
-    registre.csv
-    synthese_mensuelle.csv
-    etats_module_<id>_<etat>.csv
     rapport.json
 ```
+
+Avec `--csv`, les fichiers `registre.csv`, `synthese_mensuelle.csv` et `etats_module_*.csv` sont également exportés.
 
 - `registre.csv`:
   - Colonnes: `periode`, `id_module`, `type_module`, `flux_de_tresorerie`, `categorie`, `compte`, `description`.

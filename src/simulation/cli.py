@@ -31,6 +31,11 @@ def chemin_parametres_utilisateur() -> Path:
     return obtenir_racine_projet() / "parametres.utilisateur.yaml"
 
 
+def _formater_montant_terminal(montant: float) -> str:
+    couleur = "red" if montant < 0 else "green"
+    return f"[{couleur}]{montant:,.2f} EUR[/{couleur}]".replace(",", " ")
+
+
 def creer_dossier_sortie(
     sortie: Path | None,
     nom_run: str | None,
@@ -53,6 +58,7 @@ def lancer_simulation(
     nom_run: str | None,
     diagnostic: bool,
     periode_debug: list[str] | None,
+    csv: bool,
 ) -> None:
     chemin_defaut = parametres_defaut or chemin_parametres_defaut()
     chemin_utilisateur = parametres_utilisateur or chemin_parametres_utilisateur()
@@ -60,7 +66,7 @@ def lancer_simulation(
     try:
         if not chemin_defaut.exists():
             raise FileNotFoundError(
-                f"Fichier de paramètres par défaut introuvable: {chemin_defaut}"
+                f"Fichier de parametres par defaut introuvable: {chemin_defaut}"
             )
 
         dossier_sortie = creer_dossier_sortie(sortie=sortie, nom_run=nom_run)
@@ -70,25 +76,23 @@ def lancer_simulation(
             config,
             dossier_sortie,
             options_diagnostic=OptionsDiagnostic(actif=diagnostic, periodes_debug=periodes_debug),
+            generer_csv=csv,
         )
 
-        table = Table(title="Simulation terminée")
-        table.add_column("Métrique")
-        table.add_column("Valeur", justify="right")
+        patrimoine = resultat.metriques.get("patrimoine_par_categorie", {})
+        table = Table(title="Patrimoine final")
+        table.add_column("Categorie")
+        table.add_column("Montant", justify="right")
+        table.add_row("Cash", _formater_montant_terminal(float(patrimoine.get("cash", 0.0))))
+        table.add_row("Bourse", _formater_montant_terminal(float(patrimoine.get("bourse", 0.0))))
+        table.add_row("Immobilier", _formater_montant_terminal(float(patrimoine.get("immobilier", 0.0))))
+        table.add_row("Dettes", _formater_montant_terminal(float(patrimoine.get("dettes", 0.0))))
+        table.add_section()
         table.add_row(
-            "Solde final trésorerie", f"{resultat.metriques['solde_final_tresorerie']:.2f}"
+            "[bold]Total[/bold]",
+            _formater_montant_terminal(float(resultat.metriques.get("patrimoine_total_final", 0.0))),
         )
-        table.add_row("Flux net cumulé", f"{resultat.metriques['flux_net_cumule']:.2f}")
 
-        console.print(f"Paramètres par défaut : [bold]{chemin_defaut}[/bold]")
-        if chemin_utilisateur.exists():
-            console.print(f"Paramètres utilisateur : [bold]{chemin_utilisateur}[/bold]")
-        else:
-            console.print(
-                "Paramètres utilisateur : "
-                f"[yellow]absent ({chemin_utilisateur}), utilisation des défauts uniquement[/yellow]"
-            )
-        console.print(f"Dossier de sortie : [bold]{dossier_sortie}[/bold]")
         console.print(table)
         console.print("[green]Statut: OK[/green]")
     except Exception as erreur:  # noqa: BLE001
@@ -105,10 +109,11 @@ def commande_principale(
     nom_run: str | None = typer.Option(None, "--nom-run"),
     diagnostic: bool = typer.Option(False, "--diagnostic"),
     periode_debug: list[str] = typer.Option([], "--periode-debug"),
+    csv: bool = typer.Option(False, "--csv", help="Genere aussi les exports CSV (desactive par defaut)."),
 ) -> None:
-    """Exécute une simulation complète avec fusion défaut + utilisateur."""
+    """Execute une simulation complete avec fusion defaut + utilisateur."""
     if ctx.invoked_subcommand is None:
-        lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run, diagnostic, periode_debug)
+        lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run, diagnostic, periode_debug, csv)
 
 
 @application.command("run")
@@ -119,9 +124,10 @@ def commande_run(
     nom_run: str | None = typer.Option(None, "--nom-run"),
     diagnostic: bool = typer.Option(False, "--diagnostic"),
     periode_debug: list[str] = typer.Option([], "--periode-debug"),
+    csv: bool = typer.Option(False, "--csv", help="Genere aussi les exports CSV (desactive par defaut)."),
 ) -> None:
     """Alias explicite pour lancer la simulation."""
-    lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run, diagnostic, periode_debug)
+    lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run, diagnostic, periode_debug, csv)
 
 
 if __name__ == "__main__":

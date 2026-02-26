@@ -32,7 +32,7 @@ modules:
     )
 
 
-def test_cli_sans_arguments_cree_sortie_horodatee_et_exports(tmp_path: Path, monkeypatch) -> None:
+def test_cli_sans_arguments_cree_sortie_horodatee_et_rapport_json_seul(tmp_path: Path, monkeypatch) -> None:
     ecrire_parametres_defaut(tmp_path / "parametres.defaut.yaml")
     (tmp_path / "parametres.utilisateur.yaml").write_text("{}", encoding="utf-8")
     (tmp_path / "ailleurs").mkdir()
@@ -49,11 +49,25 @@ def test_cli_sans_arguments_cree_sortie_horodatee_et_exports(tmp_path: Path, mon
     assert re.fullmatch(r"\d{4}-\d{2}-\d{2}_\d{6}", dossiers[0].name)
 
     fichiers = {chemin.name for chemin in dossiers[0].iterdir()}
+    assert fichiers == {"rapport.json"}
+
+
+
+
+def test_cli_option_csv_reactive_les_exports_csv(tmp_path: Path, monkeypatch) -> None:
+    ecrire_parametres_defaut(tmp_path / "parametres.defaut.yaml")
+    (tmp_path / "parametres.utilisateur.yaml").write_text("{}", encoding="utf-8")
+    monkeypatch.setattr("simulation.cli.obtenir_racine_projet", lambda: tmp_path)
+
+    resultat = CliRunner().invoke(application, ["--csv"])
+
+    assert resultat.exit_code == 0
+    dossiers = sorted((tmp_path / "sorties").glob("*"))
+    fichiers = {chemin.name for chemin in dossiers[0].iterdir()}
+    assert "rapport.json" in fichiers
     assert "registre.csv" in fichiers
     assert "synthese_mensuelle.csv" in fichiers
-    assert "rapport.json" in fichiers
     assert any(nom.startswith("etats_module_") for nom in fichiers)
-
 
 def test_cli_absence_parametres_utilisateur_nest_pas_une_erreur(
     tmp_path: Path, monkeypatch
