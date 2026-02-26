@@ -37,7 +37,7 @@ def executer() -> None:
         }
         if statut == 'OK':
             analyse = subprocess.run(
-                ['python', 'scripts/analyse_sorties.py', str(dossier), '--config', str(scenario)],
+                ['python', 'scripts/analyse_sorties.py', str(dossier), '--config', str(scenario), '--write-md'],
                 cwd=RACINE,
                 capture_output=True,
                 text=True,
@@ -50,7 +50,21 @@ def executer() -> None:
     (RACINE / 'docs' / 'campagne_resultats.json').write_text(
         json.dumps(resume, ensure_ascii=False, indent=2), encoding='utf-8'
     )
+
+    kos = [
+        r for r in resume
+        if r.get('analyse', {}).get('verdict') == 'KO'
+    ]
+    top5 = sorted(
+        kos,
+        key=lambda r: abs(r.get('analyse', {}).get('solde_final_cash_recalcule', 0.0)),
+        reverse=True,
+    )[:5]
+    (RACINE / 'docs' / 'campagne_top5_ko.json').write_text(
+        json.dumps(top5, ensure_ascii=False, indent=2), encoding='utf-8'
+    )
     print('Résultats: docs/campagne_resultats.json')
+    print('Top5 KO: docs/campagne_top5_ko.json')
 
 
 if __name__ == '__main__':

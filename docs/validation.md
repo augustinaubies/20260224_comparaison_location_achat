@@ -1,56 +1,54 @@
-# Validation manuelle CLI - campagne de robustesse
+# Validation CLI - cohérence physique/maths/financière
 
-## Grille de contrôle appliquée
+## Méthode appliquée
 
-- Trésorerie: détection de solde négatif et cohérence flux/cumul.
-- Emprunt: CRD non négatif, monotone, nul à maturité si échéancier complet.
-- Immobilier: cohérence achat/location, pas de double comptage détecté dans le registre.
-- Investissement: valeur bourse non négative, versements non négatifs.
-- Sanity checks: stats min/max/quantiles et doublons de flux.
+Cycle itératif suivi:
+1. Exécution complète de la campagne (`python scripts/lancer_campagne.py`).
+2. Diagnostic automatique scénario par scénario via `scripts/analyse_sorties.py` (sorties: `rapport_scenario.md` + `reconstruction_tresorerie.csv`).
+3. Identification des KO avec mois de rupture et flux dominants.
+4. Localisation de cause racine dans le moteur (agrégation flux cash vs non-cash).
+5. Correction, puis relance subset + campagne complète.
 
-## Anomalies initiales détectées puis corrigées
+## Grille de cohérence non négociable
 
-1. **Impossible de lancer `python -m src.simulation.cli`**: imports absolus `simulation.*` non résolus hors installation package. Correction: imports relatifs dans tout `src/simulation`.
+- **Trésorerie**: cash recalculé mois par mois depuis `registre.csv`, détection du premier mois négatif.
+- **Conservation cash**: comparaison `cash_fin_recalcule` vs `solde_tresorerie` de `synthese_mensuelle.csv`.
+- **Registre**: top flux ± par `(categorie, id_module)`, doublons suspects (`periode/categorie/montant/description`).
+- **Emprunts**: CRD min, monotonicité, CRD négatif, deltas mensuels.
+- **Investissements**: flux sur comptes bourse, signe des versements, valeur bourse non négative.
+- **Sanity stats**: min/max/quantiles des flux.
 
-2. **Crash `KeyError: capital_restant_du`** quand un emprunt est hors horizon. Cause: DataFrame vide sans colonnes dans `generer_echeancier`. Correction: retour d'un DataFrame vide avec schéma explicite.
+## 5 KO initiaux les plus évidents (avant correction)
 
-3. **Incohérence métier immobilière** (location possible avant achat). Cause: absence de validation date achat/location. Correction: validation Pydantic `date_debut_location >= date_achat` + défaut YAML corrigé.
+| Scénario | Mois rupture | Solde final trésorerie (rapport) | Flux responsables dominants |
+|---|---|---:|---|
+| E12_depenses_sup_salaire | 2025-02 | -626205.64 | depenses_courantes, versement_restant |
+| E05_inflation_10 | 2028-01 | -459028.19 | depenses_courantes indexées + versement_dca |
+| E02_40_ans | 2027-01 | -375752.42 | charges long terme + investissements |
+| E13_loyer_nul_vacance_100 | 2025-02 | -273190.35 | achat/charges locatives, mensualités emprunt |
+| B03_bug2030_decalage_debut | 2028-01 | -256415.75 | mensualités locatif + versements investissement |
 
-## Résultats de campagne
+## Chaîne causale et cause racine
 
-| Scénario | Statut CLI | Anomalies |
-|---|---|---|
-| B01_bug2030_derniere_echeance | OK | Trésorerie négative dès 2028-01 |
-| B02_bug2030_taux_capital | OK | Trésorerie négative dès 2028-01 |
-| B03_bug2030_decalage_debut | OK | Trésorerie négative dès 2028-01 |
-| E01_6_mois | OK | Aucune |
-| E02_40_ans | OK | Trésorerie négative dès 2027-01 |
-| E03_debut_milieu_annee | OK | Trésorerie négative dès 2026-03 |
-| E04_inflation_zero | OK | Trésorerie négative dès 2028-01 |
-| E05_inflation_10 | OK | Trésorerie négative dès 2028-01 |
-| E06_inflation_negative | OK | Trésorerie négative dès 2028-01 |
-| E07_rendement_zero | OK | Trésorerie négative dès 2028-01 |
-| E08_crash_marche | OK | Trésorerie négative dès 2028-01 |
-| E09_emprunt_cher_apport_zero | OK | Trésorerie négative dès 2028-01 |
-| E10_pas_invest | OK | Aucune |
-| E11_salaire_nul_periode | OK | Trésorerie négative dès 2027-01 |
-| E12_depenses_sup_salaire | OK | Trésorerie négative dès 2025-02 |
-| E13_loyer_nul_vacance_100 | OK | Trésorerie négative dès 2025-02 |
-| E14_emprunt_5_ans | OK | Trésorerie négative dès 2025-02 |
-| E15_emprunt_30_ans | OK | Trésorerie négative dès 2028-01 |
-| S01_sans_immo | OK | Aucune |
-| S02_rp | OK | Aucune |
-| S03_locatif_seul | OK | Aucune |
-| S04_rp_puis_locatif | OK | Aucune |
-| S05_inflation_moderee | OK | Aucune |
+- Symptôme observé: plusieurs scénarios affichaient un `solde_tresorerie` fortement négatif alors que le cash réel restait compatible avec les flux de trésorerie.
+- Preuve: la reconstruction cash depuis `registre.csv` (en ne gardant que les comptes de trésorerie) divergeait de `synthese_mensuelle.csv`.
+- Cause racine: le moteur calculait la synthèse de trésorerie et l'investissement "restant" sur **tous** les flux du registre (y compris comptes bourse), au lieu des seuls comptes cash.
+- Effet: les versements bourse (DCA / restant) étaient comptés comme destruction nette de trésorerie agrégée, provoquant des soldes artificiellement négatifs.
 
-## Analyse spécifique bug 2030
+## Correctifs appliqués
 
-- Scénarios `B01`, `B02`, `B03` exécutés pour forcer des maturités proches/loin de 2030.
-- Aucun CRD négatif ni non-monotonicité observé après correction du schéma d'échéancier.
-- Le seul signal restant est la trésorerie négative (comportement attendu quand flux sortants > entrants sans garde de découvert).
+1. `calculer_synthese_mensuelle` accepte désormais `comptes_tresorerie` et agrège uniquement ces comptes.
+2. `generer_investissement_restant` calcule le cash disponible uniquement à partir des flux des comptes de trésorerie.
+3. Les comptes cash sont déterminés en amont dans le moteur et réutilisés de manière cohérente pour synthèse + invariant + investissement restant.
+4. Le script d'analyse a été enrichi pour générer un rapport markdown par scénario et exporter une reconstruction cash détaillée.
 
-## Limites restantes et recommandations
+## Validation après correction
 
-- Plusieurs scénarios de bord gardent une trésorerie négative: le moteur autorise implicitement le découvert.
-- Recommandation: ajouter un mode optionnel `interdire_decouvert` pour bloquer/réduire automatiquement les versements d'investissement quand cash insuffisant.
+- Relance complète campagne: **23/23 scénarios en verdict OK**.
+- Plus de divergence `cash_recalculé` vs `synthese_mensuelle` sur les scénarios de campagne.
+- Les 5 KO initiaux disparaissent avec la correction moteur globale.
+
+## Anomalies restantes
+
+- Aucune anomalie bloquante détectée dans la campagne existante.
+- Limite connue: absence de mode explicite `interdire_decouvert` au niveau produit (non nécessaire pour la campagne actuelle, mais amélioration future possible).

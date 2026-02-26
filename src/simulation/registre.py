@@ -25,11 +25,18 @@ def normaliser_registre(df: pd.DataFrame) -> pd.DataFrame:
 
 
 
-def calculer_synthese_mensuelle(registre_df: pd.DataFrame, tresorerie_initiale: float) -> pd.DataFrame:
+def calculer_synthese_mensuelle(
+    registre_df: pd.DataFrame,
+    tresorerie_initiale: float,
+    comptes_tresorerie: set[str] | None = None,
+) -> pd.DataFrame:
     if registre_df.empty:
         return pd.DataFrame(columns=["periode", "flux_net", "solde_tresorerie"])
+    flux_source = registre_df
+    if comptes_tresorerie is not None:
+        flux_source = registre_df[registre_df["compte"].isin(comptes_tresorerie)]
     flux = (
-        registre_df.groupby("periode", as_index=True)["flux_de_tresorerie"]
+        flux_source.groupby("periode", as_index=True)["flux_de_tresorerie"]
         .sum()
         .rename("flux_net")
         .to_frame()

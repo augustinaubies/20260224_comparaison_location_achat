@@ -49,6 +49,7 @@ def creer_module(config_module: object) -> ModuleSimulation:
 def generer_investissement_restant(
     calendrier: pd.PeriodIndex,
     registre_df: pd.DataFrame,
+    comptes_tresorerie: set[str],
     tresorerie_initiale: float,
     taux: float,
     rendement_annuel: float,
@@ -61,7 +62,9 @@ def generer_investissement_restant(
         )
 
     flux_par_periode = (
-        registre_df.groupby("periode")["flux_de_tresorerie"].sum()
+        registre_df[registre_df["compte"].isin(comptes_tresorerie)]
+        .groupby("periode")["flux_de_tresorerie"]
+        .sum()
         if not registre_df.empty
         else None
     )
@@ -214,6 +217,8 @@ def executer_simulation_depuis_config(
         hypotheses=config.hypotheses.model_dump(),
         comptes=config.portefeuille.comptes,
     )
+    comptes_bourse = {config.portefeuille.compte_investissement_restant}
+    comptes_tresorerie = determiner_comptes_tresorerie(config.portefeuille.comptes, comptes_bourse)
 
     registres: list[pd.DataFrame] = []
     etats_par_module: dict[str, dict[str, pd.Series | pd.DataFrame]] = {}
@@ -246,6 +251,7 @@ def executer_simulation_depuis_config(
     lignes_restant, valeur_bourse_restant = generer_investissement_restant(
         calendrier=calendrier,
         registre_df=registre_initial,
+        comptes_tresorerie=comptes_tresorerie,
         tresorerie_initiale=config.portefeuille.tresorerie_initiale,
         taux=config.portefeuille.taux_investissement_restant,
         rendement_annuel=rendement_restant,
@@ -264,11 +270,12 @@ def executer_simulation_depuis_config(
         "valeur_bourse": valeur_bourse_restant
     }
 
-    synthese_df = calculer_synthese_mensuelle(registre_df, config.portefeuille.tresorerie_initiale)
+    synthese_df = calculer_synthese_mensuelle(
+        registre_df,
+        config.portefeuille.tresorerie_initiale,
+        comptes_tresorerie=comptes_tresorerie,
+    )
     metriques = calculer_metriques(registre_df, synthese_df, etats_par_module)
-
-    comptes_bourse = {config.portefeuille.compte_investissement_restant}
-    comptes_tresorerie = determiner_comptes_tresorerie(config.portefeuille.comptes, comptes_bourse)
     anomalies = verifier_invariants(
         calendrier=calendrier,
         registre_df=registre_df,
