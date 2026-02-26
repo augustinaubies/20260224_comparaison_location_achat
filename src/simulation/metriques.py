@@ -55,7 +55,9 @@ def calculer_metriques(
     for module in config.modules:
         if module.type not in {"immobilier_locatif", "residence_principale"}:
             continue
-        valeur = float(module.prix)
+        valeur = _dernier_etat(etats_par_module.get(module.id, {}).get("valeur_bien"))
+        if valeur <= 0:
+            valeur = float(module.prix)
         immobilier_valeur_totale += valeur
         crd = _dernier_etat(etats_par_module.get(module.id, {}).get("capital_restant_du"))
         flux_module = registre_df[registre_df["id_module"] == module.id]["flux_de_tresorerie"] if not registre_df.empty else pd.Series(dtype=float)
