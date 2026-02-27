@@ -19,6 +19,9 @@ portefeuille:
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
   loyer_residence_principale: 700
+  reste_a_vivre_minimum: 1000
+  reste_a_vivre_mois_depenses: 0.0
+  indexer_reste_a_vivre_sur_inflation: true
 modules:
 - id: salaire
   type: flux_fixe

@@ -55,14 +55,22 @@ def creer_module(config_module: object) -> ModuleSimulation:
     raise ValueError(f"Type de module non supporté: {type(config_module)}")
 
 
-def calculer_impot_progressif_france(revenu_imposable: float) -> float:
+def calculer_impot_progressif_france(
+    revenu_imposable: float,
+    inflation_annuelle: float = 0.0,
+    annee_imposition: int | None = None,
+    annee_reference_bareme: int = 2025,
+) -> float:
     if revenu_imposable <= 0:
         return 0.0
+    facteur_indexation = 1.0
+    if annee_imposition is not None:
+        facteur_indexation = (1 + inflation_annuelle) ** (annee_imposition - annee_reference_bareme)
     tranches = [
-        (11497.0, 0.0),
-        (29315.0, 0.11),
-        (83823.0, 0.30),
-        (180294.0, 0.41),
+        (11497.0 * facteur_indexation, 0.0),
+        (29315.0 * facteur_indexation, 0.11),
+        (83823.0 * facteur_indexation, 0.30),
+        (180294.0 * facteur_indexation, 0.41),
         (float("inf"), 0.45),
     ]
     impot = 0.0
@@ -128,6 +136,7 @@ def generer_impot_revenu(
     registre_df: pd.DataFrame,
     compte: str,
     mois_paiement: int = 12,
+    inflation_annuelle: float = 0.0,
 ) -> pd.DataFrame:
     if registre_df.empty:
         return pd.DataFrame(columns=COLONNES_REGISTRE)
@@ -138,7 +147,7 @@ def generer_impot_revenu(
         salaires = registre_df[(registre_df["categorie"] == "salaire") & (registre_df["periode"].dt.year == annee)]
         loyers = registre_df[(registre_df["categorie"] == "loyer") & (registre_df["periode"].dt.year == annee)]
         base = float(salaires["flux_de_tresorerie"].clip(lower=0).sum()) + 0.5 * float(loyers["flux_de_tresorerie"].clip(lower=0).sum())
-        impot = calculer_impot_progressif_france(base)
+        impot = calculer_impot_progressif_france(base, inflation_annuelle=inflation_annuelle, annee_imposition=annee)
         if impot <= 0:
             continue
         periode_paiement = pd.Period(f"{annee + 1}-{mois_paiement:02d}", freq="M")
@@ -340,6 +349,7 @@ def executer_simulation_depuis_config(
         bourse_debut = etat.bourse
 
         flux_net_mensuel = 0.0
+        sorties_tresorerie_mensuelles = 0.0
         for etape in ["A", "B", "C", "D"]:
             for module in modules_par_ordre[etape]:
                 sortie = module.generer_flux_mensuel(periode, etat, contexte)
@@ -350,6 +360,8 @@ def executer_simulation_depuis_config(
                         if ligne.get("compte") in comptes_tresorerie:
                             appliquer_flux_cash(etat, montant)
                             flux_net_mensuel += montant
+                            if montant < 0:
+                                sorties_tresorerie_mensuelles += -montant
                         accumuler_base_imposable(etat, str(ligne.get("categorie", "")), montant)
                 if sortie.etats_incrementaux:
                     mod_states = valeurs_etat_modules.setdefault(module.id_module, {})
@@ -372,7 +384,11 @@ def executer_simulation_depuis_config(
             base = etat.bases_annuelles_impot.get(annee_reference)
             if base:
                 revenu = float(base.get("revenu_imposable", 0.0)) + 0.5 * float(base.get("loyers_imposables", 0.0))
-                impot = calculer_impot_progressif_france(revenu)
+                impot = calculer_impot_progressif_france(
+                    revenu,
+                    inflation_annuelle=config.hypotheses.inflation_annuelle,
+                    annee_imposition=annee_reference,
+                )
                 if impot > 0:
                     ligne_impot = {
                         "periode": periode,
@@ -386,6 +402,7 @@ def executer_simulation_depuis_config(
                     lignes_registre.append(ligne_impot)
                     appliquer_flux_cash(etat, -impot)
                     flux_net_mensuel -= impot
+                    sorties_tresorerie_mensuelles += impot
 
         # Loyer de RP si pas propriétaire (revalorisé annuellement au 1er janvier)
         if config.portefeuille.loyer_residence_principale > 0 and not etat.possessions.get("possede_rp", False):
@@ -406,10 +423,20 @@ def executer_simulation_depuis_config(
             lignes_registre.append(ligne_loyer_rp)
             appliquer_flux_cash(etat, -loyer_rp)
             flux_net_mensuel -= loyer_rp
+            sorties_tresorerie_mensuelles += loyer_rp
 
         # F) Sweep investissement restant
         appliquer_rendement_bourse(etat, taux_mensuel_restant)
-        versement = appliquer_versement_bourse(etat, max(etat.cash, 0.0) * config.portefeuille.taux_investissement_restant)
+        facteur_reste_a_vivre = facteur_revalorisation_annuelle(
+            periode,
+            calendrier[0],
+            config.hypotheses.inflation_annuelle,
+        ) if config.portefeuille.indexer_reste_a_vivre_sur_inflation else 1.0
+        reste_a_vivre_minimum = config.portefeuille.reste_a_vivre_minimum * facteur_reste_a_vivre
+        reste_a_vivre_depenses = config.portefeuille.reste_a_vivre_mois_depenses * sorties_tresorerie_mensuelles
+        reste_a_vivre_cible = max(reste_a_vivre_minimum, reste_a_vivre_depenses)
+        cash_investissable = max(etat.cash - reste_a_vivre_cible, 0.0)
+        versement = appliquer_versement_bourse(etat, cash_investissable * config.portefeuille.taux_investissement_restant)
         if versement > 0:
             lignes_registre.append(
                 {

@@ -49,6 +49,9 @@ class ConfigurationPortefeuille(BaseModel):
     id_module_investissement_restant: str = "investissement_restant"
     compte_investissement_restant: str = "courtier"
     loyer_residence_principale: float = Field(default=0.0, ge=0.0)
+    reste_a_vivre_minimum: float = Field(default=0.0, ge=0.0)
+    reste_a_vivre_mois_depenses: float = Field(default=0.0, ge=0.0)
+    indexer_reste_a_vivre_sur_inflation: bool = True
 
 
 class ConfigurationModuleBase(BaseModel):
