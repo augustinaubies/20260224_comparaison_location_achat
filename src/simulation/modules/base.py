@@ -8,6 +8,7 @@ import pandas as pd
 
 from ..etat import EtatSimulation
 from ..registre import COLONNES_REGISTRE
+from ..taux import SourceTaux
 
 
 @dataclass(slots=True)
@@ -15,6 +16,12 @@ class ContexteSimulation:
     calendrier: pd.PeriodIndex
     hypotheses: dict[str, object]
     comptes: list[str]
+    source_taux: SourceTaux | None = None
+
+    def taux_variable(self, cle: str, periode: pd.Period) -> float:
+        if self.source_taux is not None:
+            return self.source_taux.taux_annuel(cle, periode)
+        return SourceTaux(self.hypotheses).taux_annuel(cle, periode)
 
 
 @dataclass(slots=True)
