@@ -70,7 +70,7 @@ class ModuleEmprunt(ModuleSimulation):
         echeancier = generer_echeancier(
             capital=self.config.capital,
             taux_annuel=self.config.taux_annuel,
-            duree_mois=self.config.duree_mois,
+            duree_mois=self.config.duree_annees * 12,
             date_debut=self.config.date_debut,
             calendrier_global=contexte.calendrier,
         )

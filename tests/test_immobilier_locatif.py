@@ -19,7 +19,7 @@ def test_locatif_registre_et_colonnes() -> None:
         emprunt=ConfigurationEmpruntIntegree(
             capital=80000,
             taux_annuel=0.02,
-            duree_mois=120,
+            duree_annees=10,
             taux_assurance_annuel=10,
         ),
         loyer_mensuel_initial=700,

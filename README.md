@@ -178,7 +178,7 @@ Invariants vérifiés mensuellement:
   emprunt:
     capital: 280000
     taux_annuel: 0.032
-    duree_mois: 300
+    duree_annees: 25
     assurance_mensuelle: 45
   taxe_fonciere_annuelle: 1400
 ```

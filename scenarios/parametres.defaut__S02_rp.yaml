@@ -47,7 +47,7 @@ modules:
   emprunt:
     capital: 280000
     taux_annuel: 0.032
-    duree_mois: 300
+    duree_annees: 25
     taux_assurance_annuel: 0.0019285714285714286
   taxe_fonciere_annuelle: 1400
   compte: cash
