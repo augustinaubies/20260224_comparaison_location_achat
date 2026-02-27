@@ -43,6 +43,7 @@ class ConfigurationHypotheses(BaseModel):
 
 class ConfigurationPortefeuille(BaseModel):
     tresorerie_initiale: float = 0.0
+    bourse_initiale: float = 0.0
     comptes: list[str] = Field(default_factory=lambda: ["cash", "courtier"])
     taux_investissement_restant: float = Field(default=1.0, ge=0.0, le=1.0)
     id_module_investissement_restant: str = "investissement_restant"
@@ -118,15 +119,19 @@ class ConfigurationModuleResidencePrincipale(ConfigurationModuleBase):
     date_achat: str
     prix: float = Field(gt=0.0)
     taux_frais_notaire: float = Field(default=0.0, ge=0.0)
+    frais_achat: float = Field(default=0.0, ge=0.0)
+    taux_travaux: float = Field(default=0.0, ge=0.0)
     apport: float = Field(ge=0.0)
+    taux_apport_patrimoine_financier: float = Field(default=0.0, ge=0.0, le=1.0)
     emprunt: ConfigurationEmpruntIntegree
     taxe_fonciere_annuelle: float = Field(default=0.0, ge=0.0)
     compte: str = "cash"
 
     @model_validator(mode="after")
     def valider_apport(self) -> "ConfigurationModuleResidencePrincipale":
-        if self.apport > self.prix:
-            raise ValueError("L'apport ne peut pas dépasser le prix")
+        cout_total = self.prix + (self.prix * self.taux_frais_notaire) + self.frais_achat + (self.prix * self.taux_travaux)
+        if self.apport > cout_total:
+            raise ValueError("L'apport ne peut pas dépasser le coût total finançable")
         return self
 
 

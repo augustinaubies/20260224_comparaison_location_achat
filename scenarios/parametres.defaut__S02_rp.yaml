@@ -11,6 +11,7 @@ hypotheses:
   rendement_bourse_annuel: 0.05
 portefeuille:
   tresorerie_initiale: 800000
+  bourse_initiale: 0
   comptes:
   - cash
   - courtier
@@ -42,6 +43,7 @@ modules:
   date_achat: 2025-03
   prix: 320000
   apport: 40000
+  taux_apport_patrimoine_financier: 0.0
   emprunt:
     capital: 280000
     taux_annuel: 0.032
@@ -50,6 +52,8 @@ modules:
   taxe_fonciere_annuelle: 1400
   compte: cash
   taux_frais_notaire: 0.06875
+  frais_achat: 0
+  taux_travaux: 0.0
 - id: charges_rp
   type: flux_fixe
   debut: 2025-03

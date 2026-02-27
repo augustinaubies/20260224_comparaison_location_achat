@@ -323,7 +323,11 @@ def executer_simulation_depuis_config(
     lignes_registre: list[dict] = []
     lignes_synthese: list[dict] = []
     valeurs_etat_modules: dict[str, dict[str, list[tuple[pd.Period, object]]]] = {}
-    etat = EtatSimulation(periode_courante=calendrier[0], cash=config.portefeuille.tresorerie_initiale)
+    etat = EtatSimulation(
+        periode_courante=calendrier[0],
+        cash=config.portefeuille.tresorerie_initiale,
+        bourse=config.portefeuille.bourse_initiale,
+    )
 
     taux_mensuel_restant = (
         (1 + config.hypotheses.rendement_bourse_annuel) ** (1 / 12) - 1

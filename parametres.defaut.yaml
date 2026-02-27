@@ -11,6 +11,7 @@ hypotheses:
   rendement_bourse_annuel: 0.05
 portefeuille:
   tresorerie_initiale: 10000
+  bourse_initiale: 0
   comptes:
   - cash
   - courtier
@@ -42,7 +43,10 @@ modules:
   date_achat: 2027-01
   prix: 150000
   taux_frais_notaire: 0.08
+  frais_achat: 0
+  taux_travaux: 0.0
   apport: 15000
+  taux_apport_patrimoine_financier: 0.0
   emprunt:
     capital: 135000
     taux_annuel: 0.035

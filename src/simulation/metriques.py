@@ -116,6 +116,8 @@ def calculer_metriques(
     }
 
     metriques: dict[str, float | dict[str, float] | dict[str, object]] = {
+        "cash_initial": float(config.portefeuille.tresorerie_initiale),
+        "bourse_initiale": float(config.portefeuille.bourse_initiale),
         "solde_final_tresorerie": solde_final,
         "flux_net_cumule": flux_cumule,
         "resume": {
