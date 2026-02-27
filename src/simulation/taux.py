@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 
 import pandas as pd
 
@@ -26,6 +27,14 @@ def taux_annuel_depuis_source(source: object, periode: pd.Period) -> float:
 
 def taux_annuel_pour_periode(hypotheses: Mapping[str, object], cle: str, periode: pd.Period) -> float:
     return taux_annuel_depuis_source(hypotheses.get(cle, 0.0), periode)
+
+
+@dataclass(frozen=True, slots=True)
+class SourceTaux:
+    hypotheses: Mapping[str, object]
+
+    def taux_annuel(self, cle: str, periode: pd.Period) -> float:
+        return taux_annuel_depuis_source(self.hypotheses.get(cle, 0.0), periode)
 
 
 def facteur_indexation_annuelle_variable(

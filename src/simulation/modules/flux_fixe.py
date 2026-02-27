@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from ..configuration import ConfigurationModuleFluxFixe
-from ..taux import taux_annuel_pour_periode, taux_mensuel_compose
+from ..taux import taux_mensuel_compose
 from .base import ContexteSimulation, ModuleSimulation, SortieModule
 
 
@@ -56,10 +56,10 @@ class ModuleFluxFixe(ModuleSimulation):
             if i > 0:
                 if indexation in {"croissance_salaire", "indexation_loyer"}:
                     if periode.month == 1:
-                        taux_annuel = taux_annuel_pour_periode(contexte.hypotheses, cle_hypothese, periode)
+                        taux_annuel = contexte.taux_variable(cle_hypothese, periode)
                         montant_courant *= 1 + taux_annuel
                 else:
-                    taux_annuel = taux_annuel_pour_periode(contexte.hypotheses, cle_hypothese, periode)
+                    taux_annuel = contexte.taux_variable(cle_hypothese, periode)
                     montant_courant *= 1 + taux_mensuel_compose(taux_annuel)
             if periode < periode_reference:
                 resultats.append(float(self.config.montant))

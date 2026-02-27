@@ -34,7 +34,7 @@ from .modules import (
 from .modules.base import ContexteSimulation, ModuleSimulation
 from .registre import COLONNES_REGISTRE, normaliser_registre
 from .resultat import ResultatSimulation
-from .taux import facteur_indexation_annuelle_variable, taux_annuel_pour_periode, taux_mensuel_compose
+from .taux import SourceTaux, facteur_indexation_annuelle_variable, taux_mensuel_compose
 
 
 @dataclass(slots=True)
@@ -321,6 +321,7 @@ def executer_simulation_depuis_config(
         calendrier=calendrier,
         hypotheses=config.hypotheses.model_dump(),
         comptes=config.portefeuille.comptes,
+        source_taux=SourceTaux(config.hypotheses.model_dump()),
     )
 
     modules = [creer_module(config_module) for config_module in config.modules]
@@ -409,7 +410,7 @@ def executer_simulation_depuis_config(
 
         # Loyer de RP si pas propriétaire (revalorisé annuellement au 1er janvier)
         if idx > 0 and periode.month == 1:
-            taux_loyer_rp = taux_annuel_pour_periode(contexte.hypotheses, "indexation_loyers_annuelle", periode)
+            taux_loyer_rp = contexte.taux_variable("indexation_loyers_annuelle", periode)
             loyer_rp_courant *= 1 + taux_loyer_rp
         if config.portefeuille.loyer_residence_principale > 0 and not etat.possessions.get("possede_rp", False):
             loyer_rp = loyer_rp_courant
@@ -428,10 +429,10 @@ def executer_simulation_depuis_config(
             sorties_tresorerie_mensuelles += loyer_rp
 
         # F) Sweep investissement restant
-        taux_bourse_annuel = taux_annuel_pour_periode(contexte.hypotheses, "rendement_bourse_annuel", periode)
+        taux_bourse_annuel = contexte.taux_variable("rendement_bourse_annuel", periode)
         appliquer_rendement_bourse(etat, taux_mensuel_compose(taux_bourse_annuel))
         if config.portefeuille.indexer_reste_a_vivre_sur_inflation and idx > 0 and periode.month == 1:
-            taux_inflation_annuel = taux_annuel_pour_periode(contexte.hypotheses, "inflation_annuelle", periode)
+            taux_inflation_annuel = contexte.taux_variable("inflation_annuelle", periode)
             reste_a_vivre_minimum_courant *= 1 + taux_inflation_annuel
         reste_a_vivre_minimum = reste_a_vivre_minimum_courant
         reste_a_vivre_depenses = config.portefeuille.reste_a_vivre_mois_depenses * sorties_tresorerie_mensuelles

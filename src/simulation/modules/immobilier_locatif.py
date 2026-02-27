@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from ..configuration import ConfigurationModuleImmobilierLocatif
-from ..taux import taux_annuel_pour_periode, taux_mensuel_compose
+from ..taux import taux_mensuel_compose
 from .base import ContexteSimulation, ModuleSimulation, SortieModule
 from .emprunt import generer_echeancier
 
@@ -58,10 +58,10 @@ class ModuleImmobilierLocatif(ModuleSimulation):
 
         for idx, periode in enumerate(periodes_location):
             if idx > 0 and derniere_periode_calculee is not None:
-                taux_revalo = taux_annuel_pour_periode(contexte.hypotheses, "revalorisation_immobiliere_annuelle", periode)
+                taux_revalo = contexte.taux_variable("revalorisation_immobiliere_annuelle", periode)
                 valeur_bien_courante *= 1 + taux_mensuel_compose(taux_revalo)
                 if periode.month == 1:
-                    taux_loyer = taux_annuel_pour_periode(contexte.hypotheses, "indexation_loyers_annuelle", periode)
+                    taux_loyer = contexte.taux_variable("indexation_loyers_annuelle", periode)
                     loyer_base_courant *= 1 + taux_loyer
             valeur_bien = valeur_bien_courante if periode >= periode_achat else 0.0
             loyer_base = loyer_base_courant
@@ -166,7 +166,7 @@ class ModuleImmobilierLocatif(ModuleSimulation):
             valeur_courante = float(self.config.prix)
             for idx, periode in enumerate(contexte.calendrier):
                 if idx > 0:
-                    taux_revalo = taux_annuel_pour_periode(contexte.hypotheses, "revalorisation_immobiliere_annuelle", periode)
+                    taux_revalo = contexte.taux_variable("revalorisation_immobiliere_annuelle", periode)
                     valeur_courante *= 1 + taux_mensuel_compose(taux_revalo)
                 valeur_bien.loc[periode] = 0.0 if periode < periode_achat else valeur_courante
 

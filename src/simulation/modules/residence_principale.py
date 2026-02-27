@@ -4,7 +4,7 @@ import pandas as pd
 
 from ..configuration import ConfigurationModuleResidencePrincipale
 from ..etat import EtatSimulation
-from ..taux import taux_annuel_pour_periode, taux_mensuel_compose
+from ..taux import taux_mensuel_compose
 from .base import ContexteSimulation, ModuleSimulation, SortieMensuelle, SortieModule
 from .emprunt import generer_echeancier
 
@@ -107,7 +107,7 @@ class ModuleResidencePrincipale(ModuleSimulation):
             periode_courante = periode_achat
             while periode_courante < periode:
                 periode_courante += 1
-                taux_revalo = taux_annuel_pour_periode(contexte.hypotheses, "revalorisation_immobiliere_annuelle", periode_courante)
+                taux_revalo = contexte.taux_variable("revalorisation_immobiliere_annuelle", periode_courante)
                 valeur_bien *= 1 + taux_mensuel_compose(taux_revalo)
             etats_incrementaux["valeur_bien"] = valeur_bien
 
@@ -245,7 +245,7 @@ class ModuleResidencePrincipale(ModuleSimulation):
         valeur_courante = float(self.config.prix)
         for idx, periode in enumerate(contexte.calendrier):
             if idx > 0:
-                taux_revalo = taux_annuel_pour_periode(contexte.hypotheses, "revalorisation_immobiliere_annuelle", periode)
+                taux_revalo = contexte.taux_variable("revalorisation_immobiliere_annuelle", periode)
                 valeur_courante *= 1 + taux_mensuel_compose(taux_revalo)
             valeur_bien.loc[periode] = 0.0 if periode < periode_achat else valeur_courante
         etats = {
