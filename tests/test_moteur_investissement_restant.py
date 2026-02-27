@@ -152,3 +152,30 @@ def test_impot_revenu_tranches_indexees_sur_inflation() -> None:
     assert len(impot_sans_indexation) == 1
     assert len(impot_avec_indexation) == 1
     assert float(impot_avec_indexation.iloc[0]["flux_de_tresorerie"]) > float(impot_sans_indexation.iloc[0]["flux_de_tresorerie"])
+
+
+def test_impot_revenu_tranches_indexees_sur_inflation_variable() -> None:
+    calendrier = pd.period_range("2025-01", "2028-12", freq="M")
+    registre_df = pd.DataFrame(
+        {
+            "periode": list(pd.period_range("2027-01", "2027-12", freq="M")),
+            "id_module": ["salaire"] * 12,
+            "type_module": ["flux_fixe"] * 12,
+            "flux_de_tresorerie": [3000.0] * 12,
+            "categorie": ["salaire"] * 12,
+            "compte": ["cash"] * 12,
+            "description": ["Salaire"] * 12,
+        }
+    )
+
+    impot_constant = generer_impot_revenu(calendrier, registre_df, compte="cash", inflation_annuelle=0.05)
+    impot_variable = generer_impot_revenu(
+        calendrier,
+        registre_df,
+        compte="cash",
+        inflation_annuelle={"2026": 0.02, "2027": 0.03},
+    )
+
+    assert len(impot_constant) == 1
+    assert len(impot_variable) == 1
+    assert float(impot_variable.iloc[0]["flux_de_tresorerie"]) < float(impot_constant.iloc[0]["flux_de_tresorerie"])

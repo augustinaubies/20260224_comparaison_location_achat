@@ -124,3 +124,30 @@ def test_flux_fixe_sans_bornes_utilise_calendrier_global() -> None:
     sortie = ModuleFluxFixe(config).executer(contexte)
 
     assert len(sortie.registre_lignes) == 4
+
+
+def test_flux_fixe_indexation_variable_par_periode() -> None:
+    config = ConfigurationModuleFluxFixe(
+        id="salaire_variable",
+        type="flux_fixe",
+        debut="2025-12",
+        fin="2027-02",
+        montant=2000,
+        sens="revenu",
+        categorie="salaire",
+        compte="cash",
+        indexation="croissance_salaire",
+    )
+    calendrier = pd.period_range("2025-12", "2027-02", freq="M")
+    contexte = ContexteSimulation(
+        calendrier=calendrier,
+        hypotheses={"croissance_salaire_annuelle": {"2026": 0.10, "2027": 0.20}},
+        comptes=["cash"],
+    )
+
+    sortie = ModuleFluxFixe(config).executer(contexte)
+    flux = sortie.registre_lignes["flux_de_tresorerie"].tolist()
+
+    assert flux[0] == pytest.approx(2000.0)
+    assert flux[1] == pytest.approx(2200.0)
+    assert flux[-1] == pytest.approx(2640.0)

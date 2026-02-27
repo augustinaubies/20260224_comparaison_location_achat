@@ -13,7 +13,7 @@ from ..registre import COLONNES_REGISTRE
 @dataclass(slots=True)
 class ContexteSimulation:
     calendrier: pd.PeriodIndex
-    hypotheses: dict[str, float]
+    hypotheses: dict[str, object]
     comptes: list[str]
 
 

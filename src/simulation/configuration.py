@@ -18,11 +18,11 @@ class ConfigurationSimulation(BaseModel):
 
 
 class ConfigurationHypotheses(BaseModel):
-    inflation_annuelle: float = 0.0
-    croissance_salaire_annuelle: float = 0.0
-    indexation_loyers_annuelle: float = 0.0
-    revalorisation_immobiliere_annuelle: float = 0.0
-    rendement_bourse_annuel: float = 0.0
+    inflation_annuelle: float | dict[str, float] = 0.0
+    croissance_salaire_annuelle: float | dict[str, float] = 0.0
+    indexation_loyers_annuelle: float | dict[str, float] = 0.0
+    revalorisation_immobiliere_annuelle: float | dict[str, float] = 0.0
+    rendement_bourse_annuel: float | dict[str, float] = 0.0
 
     @model_validator(mode="before")
     @classmethod
