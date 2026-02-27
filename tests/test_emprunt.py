@@ -14,7 +14,7 @@ def test_emprunt_amortissement_et_capital_restant() -> None:
         date_debut="2025-01",
         capital=12000,
         taux_annuel=0.03,
-        duree_mois=24,
+        duree_annees=2,
         taux_assurance_annuel=0,
         compte="cash",
     )

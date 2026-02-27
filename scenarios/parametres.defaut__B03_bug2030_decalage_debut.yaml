@@ -49,7 +49,7 @@ modules:
   emprunt:
     capital: 210000
     taux_annuel: 0.052
-    duree_mois: 180
+    duree_annees: 15
     taux_assurance_annuel: 0.002
   date_debut_location: 2030-02
   taux_vacance: 0.05

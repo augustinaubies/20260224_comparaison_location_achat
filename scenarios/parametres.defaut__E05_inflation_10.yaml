@@ -49,7 +49,7 @@ modules:
   emprunt:
     capital: 175000
     taux_annuel: 0.035
-    duree_mois: 240
+    duree_annees: 20
     taux_assurance_annuel: 0.0024
   date_debut_location: 2070-06
   taux_vacance: 0.05

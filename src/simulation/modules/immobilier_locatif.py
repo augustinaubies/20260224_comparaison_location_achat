@@ -118,7 +118,7 @@ class ModuleImmobilierLocatif(ModuleSimulation):
         echeancier = generer_echeancier(
             capital=self.config.emprunt.capital,
             taux_annuel=self.config.emprunt.taux_annuel,
-            duree_mois=self.config.emprunt.duree_mois,
+            duree_mois=self.config.emprunt.duree_annees * 12,
             date_debut=self.config.date_achat,
             calendrier_global=contexte.calendrier,
         )
