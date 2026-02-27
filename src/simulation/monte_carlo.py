@@ -35,20 +35,8 @@ class DistributionNormale:
         return valeur
 
 
-def _extraire_hypotheses_statiques(config: ConfigurationRacine) -> dict[str, float]:
-    hypotheses = config.hypotheses.model_dump(mode="python")
-    resultats: dict[str, float] = {}
-    for cle in CLES_HYPOTHESES_MONTE_CARLO:
-        valeur = hypotheses.get(cle, 0.0)
-        if isinstance(valeur, dict):
-            continue
-        resultats[cle] = float(valeur)
-    return resultats
-
-
 def construire_distributions_initiales(config: ConfigurationRacine) -> dict[str, DistributionNormale]:
-    hypotheses_statiques = _extraire_hypotheses_statiques(config)
-    distributions = {
+    return {
         cle: DistributionNormale(
             moyenne=distribution.moyenne,
             ecart_type=distribution.ecart_type,
@@ -58,17 +46,6 @@ def construire_distributions_initiales(config: ConfigurationRacine) -> dict[str,
         for cle, distribution in config.monte_carlo.distributions.items()
         if cle in CLES_HYPOTHESES_MONTE_CARLO
     }
-    for cle, valeur_courante in hypotheses_statiques.items():
-        distribution = distributions.get(cle)
-        if distribution is None:
-            continue
-        distributions[cle] = DistributionNormale(
-            moyenne=valeur_courante,
-            ecart_type=distribution.ecart_type,
-            borne_min=distribution.borne_min,
-            borne_max=distribution.borne_max,
-        )
-    return distributions
 
 
 def executer_simulations_monte_carlo(

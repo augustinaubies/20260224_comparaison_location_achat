@@ -42,7 +42,7 @@ modules:
     )
 
 
-def test_distributions_reprennent_moyenne_de_la_config(tmp_path: Path) -> None:
+def test_distributions_reprennent_moyenne_des_distributions(tmp_path: Path) -> None:
     defaut = tmp_path / "parametres.defaut.yaml"
     utilisateur = tmp_path / "parametres.utilisateur.yaml"
     ecrire_parametres_minimaux(defaut)
@@ -52,7 +52,7 @@ def test_distributions_reprennent_moyenne_de_la_config(tmp_path: Path) -> None:
     distributions = construire_distributions_initiales(config)
 
     assert distributions["inflation_annuelle"].moyenne == 0.02
-    assert distributions["rendement_bourse_annuel"].moyenne == 0.05
+    assert distributions["rendement_bourse_annuel"].moyenne == 0.06
 
 
 def test_distributions_personnalisees_depuis_parametres(tmp_path: Path) -> None:
