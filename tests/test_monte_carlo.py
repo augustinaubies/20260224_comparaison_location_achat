@@ -21,6 +21,13 @@ hypotheses:
   indexation_loyers_annuelle: 0.015
   revalorisation_immobiliere_annuelle: 0.01
   rendement_bourse_annuel: 0.05
+monte_carlo:
+  distributions:
+    inflation_annuelle:
+      moyenne: 0.02
+      ecart_type: 0.003
+      borne_min: -0.02
+      borne_max: 0.1
 portefeuille:
   tresorerie_initiale: 1000
   comptes: ["cash", "courtier"]
@@ -46,6 +53,19 @@ def test_distributions_reprennent_moyenne_de_la_config(tmp_path: Path) -> None:
 
     assert distributions["inflation_annuelle"].moyenne == 0.02
     assert distributions["rendement_bourse_annuel"].moyenne == 0.05
+
+
+def test_distributions_personnalisees_depuis_parametres(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    utilisateur = tmp_path / "parametres.utilisateur.yaml"
+    ecrire_parametres_minimaux(defaut)
+    utilisateur.write_text("{}", encoding="utf-8")
+    config = charger_configuration(defaut, utilisateur)
+
+    distributions = construire_distributions_initiales(config)
+
+    assert distributions["inflation_annuelle"].ecart_type == 0.003
+    assert distributions["inflation_annuelle"].borne_min == -0.02
 
 
 def test_monte_carlo_reproductible_et_exports_csv(tmp_path: Path) -> None:

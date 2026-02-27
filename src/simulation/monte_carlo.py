@@ -35,15 +35,6 @@ class DistributionNormale:
         return valeur
 
 
-DISTRIBUTIONS_PAR_DEFAUT: dict[str, DistributionNormale] = {
-    "inflation_annuelle": DistributionNormale(moyenne=0.02, ecart_type=0.002, borne_min=-0.03, borne_max=0.15),
-    "croissance_salaire_annuelle": DistributionNormale(moyenne=0.025, ecart_type=0.005, borne_min=-0.05, borne_max=0.2),
-    "indexation_loyers_annuelle": DistributionNormale(moyenne=0.018, ecart_type=0.006, borne_min=-0.05, borne_max=0.2),
-    "revalorisation_immobiliere_annuelle": DistributionNormale(moyenne=0.015, ecart_type=0.01, borne_min=-0.15, borne_max=0.2),
-    "rendement_bourse_annuel": DistributionNormale(moyenne=0.06, ecart_type=0.15, borne_min=-0.9, borne_max=0.9),
-}
-
-
 def _extraire_hypotheses_statiques(config: ConfigurationRacine) -> dict[str, float]:
     hypotheses = config.hypotheses.model_dump(mode="python")
     resultats: dict[str, float] = {}
@@ -57,7 +48,16 @@ def _extraire_hypotheses_statiques(config: ConfigurationRacine) -> dict[str, flo
 
 def construire_distributions_initiales(config: ConfigurationRacine) -> dict[str, DistributionNormale]:
     hypotheses_statiques = _extraire_hypotheses_statiques(config)
-    distributions = dict(DISTRIBUTIONS_PAR_DEFAUT)
+    distributions = {
+        cle: DistributionNormale(
+            moyenne=distribution.moyenne,
+            ecart_type=distribution.ecart_type,
+            borne_min=distribution.borne_min,
+            borne_max=distribution.borne_max,
+        )
+        for cle, distribution in config.monte_carlo.distributions.items()
+        if cle in CLES_HYPOTHESES_MONTE_CARLO
+    }
     for cle, valeur_courante in hypotheses_statiques.items():
         distribution = distributions.get(cle)
         if distribution is None:

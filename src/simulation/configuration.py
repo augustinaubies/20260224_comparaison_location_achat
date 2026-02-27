@@ -41,6 +41,75 @@ class ConfigurationHypotheses(BaseModel):
         return normalise
 
 
+
+
+def distributions_monte_carlo_par_defaut() -> dict[str, dict[str, float | None]]:
+    return {
+        "inflation_annuelle": {
+            "moyenne": 0.02,
+            "ecart_type": 0.002,
+            "borne_min": -0.03,
+            "borne_max": 0.15,
+        },
+        "croissance_salaire_annuelle": {
+            "moyenne": 0.025,
+            "ecart_type": 0.005,
+            "borne_min": -0.05,
+            "borne_max": 0.2,
+        },
+        "indexation_loyers_annuelle": {
+            "moyenne": 0.018,
+            "ecart_type": 0.006,
+            "borne_min": -0.05,
+            "borne_max": 0.2,
+        },
+        "revalorisation_immobiliere_annuelle": {
+            "moyenne": 0.015,
+            "ecart_type": 0.01,
+            "borne_min": -0.15,
+            "borne_max": 0.2,
+        },
+        "rendement_bourse_annuel": {
+            "moyenne": 0.06,
+            "ecart_type": 0.15,
+            "borne_min": -0.9,
+            "borne_max": 0.9,
+        },
+    }
+
+class ConfigurationDistributionNormale(BaseModel):
+    moyenne: float
+    ecart_type: float = Field(ge=0.0)
+    borne_min: float | None = None
+    borne_max: float | None = None
+
+
+class ConfigurationMonteCarlo(BaseModel):
+    distributions: dict[str, ConfigurationDistributionNormale] = Field(
+        default_factory=lambda: {
+            cle: ConfigurationDistributionNormale(**distribution)
+            for cle, distribution in distributions_monte_carlo_par_defaut().items()
+        }
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def completer_distributions_manquantes(cls, data: object) -> object:
+        if not isinstance(data, dict):
+            return data
+        defaults = distributions_monte_carlo_par_defaut()
+        distributions = data.get("distributions")
+        if not isinstance(distributions, dict):
+            return {**data, "distributions": defaults}
+        return {
+            **data,
+            "distributions": {
+                **defaults,
+                **distributions,
+            },
+        }
+
+
 class ConfigurationPortefeuille(BaseModel):
     tresorerie_initiale: float = 0.0
     bourse_initiale: float = 0.0
@@ -176,6 +245,7 @@ ConfigurationModule = Annotated[
 class ConfigurationRacine(BaseModel):
     simulation: ConfigurationSimulation
     hypotheses: ConfigurationHypotheses = Field(default_factory=ConfigurationHypotheses)
+    monte_carlo: ConfigurationMonteCarlo = Field(default_factory=ConfigurationMonteCarlo)
     portefeuille: ConfigurationPortefeuille = Field(default_factory=ConfigurationPortefeuille)
     modules: list[ConfigurationModule] = Field(default_factory=list)
 
