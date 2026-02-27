@@ -6,12 +6,12 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 import typer
+import yaml
 from rich.console import Console
 from rich.table import Table
 
-from .configuration import charger_configuration
+from .configuration import ConfigurationRacine, charger_configuration
 from .moteur import OptionsDiagnostic, executer_simulation_depuis_config
-from pdb import set_trace as breakpoint
 
 application = typer.Typer(
     help="CLI du moteur de simulation de portefeuille.", invoke_without_command=True
@@ -78,6 +78,12 @@ def lancer_simulation(
             options_diagnostic=OptionsDiagnostic(actif=diagnostic, periodes_debug=periodes_debug),
             generer_csv=csv,
         )
+        exporter_parametrage_simulation(
+            dossier_sortie=dossier_sortie,
+            chemin_parametres_defaut=chemin_defaut,
+            chemin_parametres_utilisateur=chemin_utilisateur,
+            config=config,
+        )
 
         patrimoine = resultat.metriques.get("patrimoine_par_categorie", {})
         table = Table(title="Patrimoine final")
@@ -98,6 +104,32 @@ def lancer_simulation(
     except Exception as erreur:  # noqa: BLE001
         console.print(f"[red]Statut: ERREUR - {erreur}[/red]")
         raise typer.Exit(code=1) from erreur
+
+
+def exporter_parametrage_simulation(
+    dossier_sortie: Path,
+    chemin_parametres_defaut: Path,
+    chemin_parametres_utilisateur: Path,
+    config: ConfigurationRacine,
+) -> None:
+    dossier_sortie.mkdir(parents=True, exist_ok=True)
+
+    if chemin_parametres_defaut.exists():
+        (dossier_sortie / "parametres.defaut.yaml").write_text(
+            chemin_parametres_defaut.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+    if chemin_parametres_utilisateur.exists():
+        (dossier_sortie / "parametres.utilisateur.yaml").write_text(
+            chemin_parametres_utilisateur.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+    (dossier_sortie / "parametres.fusionnes.yaml").write_text(
+        yaml.safe_dump(config.model_dump(mode="json"), sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
 
 
 @application.callback(invoke_without_command=True)

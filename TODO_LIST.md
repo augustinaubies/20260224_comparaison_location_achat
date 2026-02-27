@@ -6,7 +6,8 @@
 
 ---
 
-[] Faire en sorte de sauvegarder le paramétrage avec les résultats.
+[X] Faire en sorte de sauvegarder le paramétrage avec les résultats.
+  - Implémenté dans la CLI: export automatique de `parametres.defaut.yaml`, `parametres.utilisateur.yaml` (si présent) et `parametres.fusionnes.yaml` dans chaque dossier de sortie.
 [] Vérifier que les paramètres qui varient dans le temps ont des temps de variations cohérents (annuels pour le salaire et les loyers, mensuels pour le prix de l'immobilier l'inflation etc)
 [] Ajouter un reste à vivre suffisant, dépendant des dépenses mensuelles et loyer (mensualités etc) qui fait que l'on ne met pas en bourse l'intégralité du cash.
 [] Le capital emprunté ne doit plus être un paramètre, il est calculé automatiquement.
