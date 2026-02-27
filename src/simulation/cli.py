@@ -12,6 +12,7 @@ from rich.table import Table
 
 from .configuration import ConfigurationRacine, charger_configuration
 from .moteur import OptionsDiagnostic, executer_simulation_depuis_config
+from .monte_carlo import executer_simulations_monte_carlo
 
 application = typer.Typer(
     help="CLI du moteur de simulation de portefeuille.", invoke_without_command=True
@@ -160,6 +161,55 @@ def commande_run(
 ) -> None:
     """Alias explicite pour lancer la simulation."""
     lancer_simulation(parametres_defaut, parametres_utilisateur, sortie, nom_run, diagnostic, periode_debug, csv)
+
+
+@application.command("monte-carlo")
+def commande_monte_carlo(
+    parametres_defaut: Path = typer.Option(None, "--parametres-defaut", "--defaut"),
+    parametres_utilisateur: Path = typer.Option(None, "--parametres-utilisateur", "--utilisateur"),
+    sortie: Path | None = typer.Option(None, "--sortie"),
+    nom_run: str | None = typer.Option("monte-carlo", "--nom-run"),
+    tirages: int = typer.Option(200, "--tirages", min=1),
+    graine: int = typer.Option(42, "--graine"),
+) -> None:
+    """Lance plusieurs simulations avec des hypothèses tirées aléatoirement."""
+    chemin_defaut = parametres_defaut or chemin_parametres_defaut()
+    chemin_utilisateur = parametres_utilisateur or chemin_parametres_utilisateur()
+
+    try:
+        if not chemin_defaut.exists():
+            raise FileNotFoundError(f"Fichier de parametres par defaut introuvable: {chemin_defaut}")
+
+        dossier_sortie = creer_dossier_sortie(sortie=sortie, nom_run=nom_run)
+        config = charger_configuration(chemin_defaut, chemin_utilisateur)
+        resume_df = executer_simulations_monte_carlo(
+            config=config,
+            dossier_sortie=dossier_sortie,
+            nombre_tirages=tirages,
+            graine=graine,
+        )
+        exporter_parametrage_simulation(
+            dossier_sortie=dossier_sortie,
+            chemin_parametres_defaut=chemin_defaut,
+            chemin_parametres_utilisateur=chemin_utilisateur,
+            config=config,
+        )
+
+        moyenne = float(resume_df["patrimoine_total_final"].mean())
+        p10 = float(resume_df["patrimoine_total_final"].quantile(0.10))
+        p90 = float(resume_df["patrimoine_total_final"].quantile(0.90))
+
+        table = Table(title=f"Monte Carlo ({tirages} tirages)")
+        table.add_column("Métrique")
+        table.add_column("Valeur", justify="right")
+        table.add_row("Patrimoine moyen", _formater_montant_terminal(moyenne))
+        table.add_row("Patrimoine P10", _formater_montant_terminal(p10))
+        table.add_row("Patrimoine P90", _formater_montant_terminal(p90))
+        console.print(table)
+        console.print("[green]Statut: OK[/green]")
+    except Exception as erreur:  # noqa: BLE001
+        console.print(f"[red]Statut: ERREUR - {erreur}[/red]")
+        raise typer.Exit(code=1) from erreur
 
 
 if __name__ == "__main__":

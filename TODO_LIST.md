@@ -23,5 +23,7 @@
 [X] Les tranches d'impôts doivent être indexés sur l'inflation.
   - Implémenté dans le calcul d'IR progressif avec indexation annuelle des bornes de tranches selon `hypotheses.inflation_annuelle`.
 [] Une fois le moteur et les modules validés, il faudra faire un gros travail de modélisation sur les distributions de chacun des paramètres, afin de pouvoir faire des tirages aléatoires. Beaucoup de variables seront corrélées entre elles (surtout autour de l'inflation). Il faudra faire un travail important de data science sur ce sujet.
-  [] On peut commencer par définir des valeurs du bon ordre de grandeur pour des distributions des paramètres (par exemple inflation = N(mu=2%, sigma=0.2%)) afin de tester si tout fonctionne correctement.
-  [] Tester de faire des tirages MC : définir le nombre à tirer, la graine initiale également.
+  [X] On peut commencer par définir des valeurs du bon ordre de grandeur pour des distributions des paramètres (par exemple inflation = N(mu=2%, sigma=0.2%)) afin de tester si tout fonctionne correctement.
+    - Implémenté via `simulation.monte_carlo.DISTRIBUTIONS_PAR_DEFAUT` (normales tronquées) avec moyennes alignées sur la config et bornes de sécurité.
+  [X] Tester de faire des tirages MC : définir le nombre à tirer, la graine initiale également.
+    - Implémenté via la commande CLI `monte-carlo` (`--tirages`, `--graine`) et exports `monte_carlo_tirages.csv` / `monte_carlo_resume.csv`.
