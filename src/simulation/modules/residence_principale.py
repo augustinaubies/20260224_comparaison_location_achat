@@ -185,14 +185,16 @@ class ModuleResidencePrincipale(ModuleSimulation):
                     }
                 )
 
+        cout_total = self._cout_total_financable()
+        capital_emprunte = max(cout_total - self.config.apport, 0.0)
         echeancier = generer_echeancier(
-            capital=self.config.emprunt.capital,
+            capital=capital_emprunte,
             taux_annuel=self.config.emprunt.taux_annuel,
             duree_mois=self.config.emprunt.duree_annees * 12,
             date_debut=self.config.date_achat,
             calendrier_global=contexte.calendrier,
         )
-        assurance_mensuelle = self.config.emprunt.capital * self.config.emprunt.taux_assurance_annuel / 12
+        assurance_mensuelle = capital_emprunte * self.config.emprunt.taux_assurance_annuel / 12
         for _, ligne in echeancier.iterrows():
             lignes.append(
                 {

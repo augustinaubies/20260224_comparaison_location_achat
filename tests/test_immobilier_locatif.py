@@ -18,7 +18,6 @@ def test_locatif_registre_et_colonnes() -> None:
         taux_travaux=0.02,
         apport=20000,
         emprunt=ConfigurationEmpruntIntegree(
-            capital=80000,
             taux_annuel=0.02,
             duree_annees=10,
             taux_assurance_annuel=10,
@@ -59,7 +58,6 @@ def test_locatif_loyer_revalorise_au_premier_janvier_et_valeur_bien_mensuelle() 
         prix=100000,
         apport=20000,
         emprunt=ConfigurationEmpruntIntegree(
-            capital=80000,
             taux_annuel=0.0,
             duree_annees=10,
             taux_assurance_annuel=0.0,

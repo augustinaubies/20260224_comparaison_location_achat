@@ -45,7 +45,6 @@ modules:
   apport: 40000
   taux_apport_patrimoine_financier: 0.0
   emprunt:
-    capital: 280000
     taux_annuel: 0.032
     duree_annees: 25
     taux_assurance_annuel: 0.0019285714285714286
