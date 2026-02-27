@@ -47,7 +47,6 @@ modules:
   prix: 220000
   apport: 45000
   emprunt:
-    capital: 175000
     taux_annuel: 0.035
     duree_annees: 5
     taux_assurance_annuel: 0.0024

@@ -31,7 +31,6 @@ def test_rp_financement_inclut_travaux_et_apport_depuis_cash_puis_bourse(tmp_pat
                     "apport": 0,
                     "taux_apport_patrimoine_financier": 0.5,
                     "emprunt": {
-                        "capital": 1,
                         "taux_annuel": 0.03,
                         "duree_annees": 20,
                         "taux_assurance_annuel": 0.0,

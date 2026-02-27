@@ -15,6 +15,12 @@ class ModuleImmobilierLocatif(ModuleSimulation):
         self.config = config
         self.id_module = config.id
 
+    def _capital_emprunte(self) -> float:
+        frais_notaire = self.config.prix * self.config.taux_frais_notaire
+        budget_travaux = self.config.prix * self.config.taux_travaux
+        cout_total = self.config.prix + frais_notaire + budget_travaux
+        return max(cout_total - self.config.apport, 0.0)
+
     def executer_batch(self, contexte: ContexteSimulation) -> SortieModule:
         lignes: list[dict] = []
 
@@ -118,14 +124,15 @@ class ModuleImmobilierLocatif(ModuleSimulation):
                 ]
             )
 
+        capital_emprunte = self._capital_emprunte()
         echeancier = generer_echeancier(
-            capital=self.config.emprunt.capital,
+            capital=capital_emprunte,
             taux_annuel=self.config.emprunt.taux_annuel,
             duree_mois=self.config.emprunt.duree_annees * 12,
             date_debut=self.config.date_achat,
             calendrier_global=contexte.calendrier,
         )
-        assurance_mensuelle = self.config.emprunt.capital * self.config.emprunt.taux_assurance_annuel / 12
+        assurance_mensuelle = capital_emprunte * self.config.emprunt.taux_assurance_annuel / 12
         for _, ligne in echeancier.iterrows():
             lignes.append(
                 {

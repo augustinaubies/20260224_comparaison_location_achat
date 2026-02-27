@@ -176,7 +176,6 @@ Invariants vérifiés mensuellement:
   frais_notaire: 22000
   apport: 40000
   emprunt:
-    capital: 280000
     taux_annuel: 0.032
     duree_annees: 25
     assurance_mensuelle: 45

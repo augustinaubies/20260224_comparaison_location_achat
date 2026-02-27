@@ -93,7 +93,6 @@ class ConfigurationModuleEmprunt(ConfigurationModuleBase):
 
 
 class ConfigurationEmpruntIntegree(BaseModel):
-    capital: float = Field(gt=0.0)
     taux_annuel: float = Field(ge=0.0)
     duree_annees: PositiveInt
     taux_assurance_annuel: float = Field(default=0.0, ge=0.0)
@@ -131,8 +130,9 @@ class ConfigurationModuleImmobilierLocatif(ConfigurationModuleBase):
 
     @model_validator(mode="after")
     def valider_apport(self) -> "ConfigurationModuleImmobilierLocatif":
-        if self.apport > self.prix:
-            raise ValueError("L'apport ne peut pas dépasser le prix")
+        cout_total = self.prix + (self.prix * self.taux_frais_notaire) + (self.prix * self.taux_travaux)
+        if self.apport > cout_total:
+            raise ValueError("L'apport ne peut pas dépasser le coût total finançable")
         date_achat = datetime.strptime(self.date_achat, "%Y-%m")
         date_debut_location = datetime.strptime(self.date_debut_location, "%Y-%m")
         if date_debut_location < date_achat:
