@@ -9,6 +9,33 @@ hypotheses:
   indexation_loyers_annuelle: 0.02
   revalorisation_immobiliere_annuelle: 0.01
   rendement_bourse_annuel: 0.05
+monte_carlo:
+  distributions:
+    inflation_annuelle:
+      moyenne: 0.02
+      ecart_type: 0.002
+      borne_min: -0.03
+      borne_max: 0.15
+    croissance_salaire_annuelle:
+      moyenne: 0.025
+      ecart_type: 0.005
+      borne_min: -0.05
+      borne_max: 0.2
+    indexation_loyers_annuelle:
+      moyenne: 0.018
+      ecart_type: 0.006
+      borne_min: -0.05
+      borne_max: 0.2
+    revalorisation_immobiliere_annuelle:
+      moyenne: 0.015
+      ecart_type: 0.01
+      borne_min: -0.15
+      borne_max: 0.2
+    rendement_bourse_annuel:
+      moyenne: 0.06
+      ecart_type: 0.15
+      borne_min: -0.9
+      borne_max: 0.9
 portefeuille:
   tresorerie_initiale: 10000
   bourse_initiale: 0
