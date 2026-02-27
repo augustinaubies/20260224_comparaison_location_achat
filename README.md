@@ -59,6 +59,17 @@ python -m simulation.cli run --diagnostic --periode-debug 2030-01 --periode-debu
 
 En mode `--diagnostic`, toute violation d'invariant provoque un échec immédiat de la simulation.
 
+Mode Monte Carlo (tirages aléatoires des hypothèses macro):
+
+```bash
+python -m simulation.cli monte-carlo --tirages 500 --graine 42
+```
+
+Cette commande produit:
+- `monte_carlo_tirages.csv` (1 ligne par tirage + hypothèses tirées),
+- `monte_carlo_resume.csv` (statistiques descriptives),
+- et le snapshot de paramétrage (`parametres.*.yaml`).
+
 ## Fichiers de configuration
 
 - `parametres.defaut.yaml`: paramètres publics versionnés.
