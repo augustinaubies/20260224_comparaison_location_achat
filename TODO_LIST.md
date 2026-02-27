@@ -27,3 +27,5 @@
     - Implémenté via `simulation.monte_carlo.DISTRIBUTIONS_PAR_DEFAUT` (normales tronquées) avec moyennes alignées sur la config et bornes de sécurité.
   [X] Tester de faire des tirages MC : définir le nombre à tirer, la graine initiale également.
     - Implémenté via la commande CLI `monte-carlo` (`--tirages`, `--graine`) et exports `monte_carlo_tirages.csv` / `monte_carlo_resume.csv`.
+  [] Mettre en place les tirages MC dans le paramétrage par défaut, et remplacer les paramètres constants par les distributions. Retirer les hypothèses en dur sur les distributions pour tout centraliser dans le fichier de paramètres.
+  [] Il faut que les fonctions qui utilisent les paramètres variables n'aient pas l'information de comment les valeurs ont été obtenues. En effet, il faudra plus tard que les variables puissent suivre des lois de probabilités complexes, avec des correlations etc donc il faut que le workflow soit propre.

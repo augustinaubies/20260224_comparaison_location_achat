@@ -18,7 +18,7 @@ portefeuille:
   taux_investissement_restant: 1.0
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
-  loyer_residence_principale: 700
+  loyer_residence_principale: 900
   reste_a_vivre_minimum: 1000
   reste_a_vivre_mois_depenses: 0.0
   indexer_reste_a_vivre_sur_inflation: true
@@ -35,7 +35,7 @@ modules:
   indexation: croissance_salaire
 - id: depenses_vie
   type: flux_fixe
-  montant: 1300
+  montant: 1200
   frequence: mensuelle
   sens: depense
   categorie: depenses_courantes
@@ -52,7 +52,7 @@ modules:
   taux_apport_patrimoine_financier: 1.0
   emprunt:
     taux_annuel: 0.035
-    duree_mois: 300
+    duree_annees: 25
     taux_assurance_annuel: 0.003
   taxe_fonciere_annuelle: 900
   compte: cash
