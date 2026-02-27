@@ -130,3 +130,25 @@ def test_impot_revenu_avec_abattement_micro_bic() -> None:
 
     assert len(impot) == 1
     assert float(impot.iloc[0]["flux_de_tresorerie"]) == -5765.48
+
+
+def test_impot_revenu_tranches_indexees_sur_inflation() -> None:
+    calendrier = pd.period_range("2025-01", "2027-12", freq="M")
+    registre_df = pd.DataFrame(
+        {
+            "periode": list(pd.period_range("2026-01", "2026-12", freq="M")),
+            "id_module": ["salaire"] * 12,
+            "type_module": ["flux_fixe"] * 12,
+            "flux_de_tresorerie": [3000.0] * 12,
+            "categorie": ["salaire"] * 12,
+            "compte": ["cash"] * 12,
+            "description": ["Salaire"] * 12,
+        }
+    )
+
+    impot_sans_indexation = generer_impot_revenu(calendrier, registre_df, compte="cash", inflation_annuelle=0.0)
+    impot_avec_indexation = generer_impot_revenu(calendrier, registre_df, compte="cash", inflation_annuelle=0.10)
+
+    assert len(impot_sans_indexation) == 1
+    assert len(impot_avec_indexation) == 1
+    assert float(impot_avec_indexation.iloc[0]["flux_de_tresorerie"]) > float(impot_sans_indexation.iloc[0]["flux_de_tresorerie"])

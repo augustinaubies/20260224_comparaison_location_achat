@@ -92,12 +92,15 @@ Règle de chargement:
 - `id_module_investissement_restant`: identifiant de module utilisé dans le registre (`investissement_restant` par défaut).
 - `compte_investissement_restant`: compte de destination des versements (`courtier` par défaut).
 - `loyer_residence_principale`: loyer mensuel de RP tant qu'aucune RP n'est possédée.
+- `reste_a_vivre_minimum`: montant minimal conservé sur le compte courant avant sweep d'investissement.
+- `reste_a_vivre_mois_depenses`: multiple des sorties de trésorerie mensuelles à conserver en cash.
+- `indexer_reste_a_vivre_sur_inflation`: active l'indexation annuelle du `reste_a_vivre_minimum` au 1er janvier.
 
 ## Fiscalité
 
-- Un flux annuel `impot_sur_le_revenu` est généré en décembre.
+- Un flux annuel `impot_sur_le_revenu` est généré en septembre N+1 (configurable via `simulation.mois_paiement_impot_revenu`).
 - Base imposable: salaires (`categorie=salaire`) + 50% des loyers locatifs meublés (`categorie=loyer`, hypothèse micro-BIC).
-- Barème progressif français appliqué par tranches (sans prélèvements sociaux supplémentaires).
+- Barème progressif français appliqué par tranches, avec indexation annuelle des bornes sur `hypotheses.inflation_annuelle` (sans prélèvements sociaux supplémentaires).
 
 ## Structure des résultats
 

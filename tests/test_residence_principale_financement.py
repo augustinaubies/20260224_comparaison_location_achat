@@ -98,3 +98,41 @@ def test_loyer_residence_principale_revalorise_au_premier_janvier(tmp_path: Path
 
     assert loyers[:3] == pytest.approx([-1000.0, -1000.0, -1000.0])
     assert loyers[3:] == pytest.approx([-1120.0, -1120.0])
+
+
+def test_reste_a_vivre_limite_investissement_automatique(tmp_path: Path) -> None:
+    config = ConfigurationRacine.model_validate(
+        {
+            "simulation": {"date_debut": "2025-01", "date_fin": "2025-01"},
+            "hypotheses": {"rendement_bourse_annuel": 0.0},
+            "portefeuille": {
+                "tresorerie_initiale": 0.0,
+                "comptes": ["cash", "courtier"],
+                "taux_investissement_restant": 1.0,
+                "reste_a_vivre_minimum": 1000.0,
+                "indexer_reste_a_vivre_sur_inflation": False,
+            },
+            "modules": [
+                {
+                    "id": "salaire",
+                    "type": "flux_fixe",
+                    "montant": 3000.0,
+                    "sens": "revenu",
+                    "categorie": "salaire",
+                },
+                {
+                    "id": "depenses",
+                    "type": "flux_fixe",
+                    "montant": 1500.0,
+                    "sens": "depense",
+                    "categorie": "depenses_courantes",
+                },
+            ],
+        }
+    )
+
+    resultat = executer_simulation_depuis_config(config, tmp_path, generer_csv=False)
+    versements = resultat.registre_df[resultat.registre_df["categorie"] == "versement_restant"]["flux_de_tresorerie"].tolist()
+
+    assert versements == pytest.approx([-500.0])
+    assert resultat.synthese_df.iloc[-1]["tresorerie_fin"] == pytest.approx(1000.0)
