@@ -34,7 +34,7 @@ from .modules import (
 from .modules.base import ContexteSimulation, ModuleSimulation
 from .registre import COLONNES_REGISTRE, normaliser_registre
 from .resultat import ResultatSimulation
-from .taux import facteur_revalorisation_annuelle
+from .taux import facteur_indexation_annuelle_variable, taux_annuel_pour_periode, taux_mensuel_compose
 
 
 @dataclass(slots=True)
@@ -57,7 +57,7 @@ def creer_module(config_module: object) -> ModuleSimulation:
 
 def calculer_impot_progressif_france(
     revenu_imposable: float,
-    inflation_annuelle: float = 0.0,
+    inflation_annuelle: object = 0.0,
     annee_imposition: int | None = None,
     annee_reference_bareme: int = 2025,
 ) -> float:
@@ -65,7 +65,11 @@ def calculer_impot_progressif_france(
         return 0.0
     facteur_indexation = 1.0
     if annee_imposition is not None:
-        facteur_indexation = (1 + inflation_annuelle) ** (annee_imposition - annee_reference_bareme)
+        facteur_indexation = facteur_indexation_annuelle_variable(
+            annee_reference=annee_reference_bareme,
+            annee_cible=annee_imposition,
+            source_taux_annuel=inflation_annuelle,
+        )
     tranches = [
         (11497.0 * facteur_indexation, 0.0),
         (29315.0 * facteur_indexation, 0.11),
@@ -136,7 +140,7 @@ def generer_impot_revenu(
     registre_df: pd.DataFrame,
     compte: str,
     mois_paiement: int = 12,
-    inflation_annuelle: float = 0.0,
+    inflation_annuelle: object = 0.0,
 ) -> pd.DataFrame:
     if registre_df.empty:
         return pd.DataFrame(columns=COLONNES_REGISTRE)
@@ -339,9 +343,8 @@ def executer_simulation_depuis_config(
         bourse=config.portefeuille.bourse_initiale,
     )
 
-    taux_mensuel_restant = (
-        (1 + config.hypotheses.rendement_bourse_annuel) ** (1 / 12) - 1
-    )
+    loyer_rp_courant = float(config.portefeuille.loyer_residence_principale)
+    reste_a_vivre_minimum_courant = float(config.portefeuille.reste_a_vivre_minimum)
 
     for idx, periode in enumerate(calendrier):
         etat.periode_courante = periode
@@ -405,12 +408,11 @@ def executer_simulation_depuis_config(
                     sorties_tresorerie_mensuelles += impot
 
         # Loyer de RP si pas propriétaire (revalorisé annuellement au 1er janvier)
+        if idx > 0 and periode.month == 1:
+            taux_loyer_rp = taux_annuel_pour_periode(contexte.hypotheses, "indexation_loyers_annuelle", periode)
+            loyer_rp_courant *= 1 + taux_loyer_rp
         if config.portefeuille.loyer_residence_principale > 0 and not etat.possessions.get("possede_rp", False):
-            loyer_rp = config.portefeuille.loyer_residence_principale * facteur_revalorisation_annuelle(
-                periode,
-                calendrier[0],
-                config.hypotheses.indexation_loyers_annuelle,
-            )
+            loyer_rp = loyer_rp_courant
             ligne_loyer_rp = {
                 "periode": periode,
                 "id_module": "loyer_residence_principale",
@@ -426,13 +428,12 @@ def executer_simulation_depuis_config(
             sorties_tresorerie_mensuelles += loyer_rp
 
         # F) Sweep investissement restant
-        appliquer_rendement_bourse(etat, taux_mensuel_restant)
-        facteur_reste_a_vivre = facteur_revalorisation_annuelle(
-            periode,
-            calendrier[0],
-            config.hypotheses.inflation_annuelle,
-        ) if config.portefeuille.indexer_reste_a_vivre_sur_inflation else 1.0
-        reste_a_vivre_minimum = config.portefeuille.reste_a_vivre_minimum * facteur_reste_a_vivre
+        taux_bourse_annuel = taux_annuel_pour_periode(contexte.hypotheses, "rendement_bourse_annuel", periode)
+        appliquer_rendement_bourse(etat, taux_mensuel_compose(taux_bourse_annuel))
+        if config.portefeuille.indexer_reste_a_vivre_sur_inflation and idx > 0 and periode.month == 1:
+            taux_inflation_annuel = taux_annuel_pour_periode(contexte.hypotheses, "inflation_annuelle", periode)
+            reste_a_vivre_minimum_courant *= 1 + taux_inflation_annuel
+        reste_a_vivre_minimum = reste_a_vivre_minimum_courant
         reste_a_vivre_depenses = config.portefeuille.reste_a_vivre_mois_depenses * sorties_tresorerie_mensuelles
         reste_a_vivre_cible = max(reste_a_vivre_minimum, reste_a_vivre_depenses)
         cash_investissable = max(etat.cash - reste_a_vivre_cible, 0.0)

@@ -4,7 +4,7 @@ import pandas as pd
 
 from ..configuration import ConfigurationModuleResidencePrincipale
 from ..etat import EtatSimulation
-from ..taux import taux_mensuel_compose
+from ..taux import taux_annuel_pour_periode, taux_mensuel_compose
 from .base import ContexteSimulation, ModuleSimulation, SortieMensuelle, SortieModule
 from .emprunt import generer_echeancier
 
@@ -102,9 +102,14 @@ class ModuleResidencePrincipale(ModuleSimulation):
             "capital_rembourse": 0.0,
         }
 
-        taux_revalo = taux_mensuel_compose(float(contexte.hypotheses.get("revalorisation_immobiliere_annuelle", 0.0)))
         if periode >= periode_achat:
-            etats_incrementaux["valeur_bien"] = self.config.prix * ((1 + taux_revalo) ** (periode.ordinal - periode_achat.ordinal))
+            valeur_bien = float(self.config.prix)
+            periode_courante = periode_achat
+            while periode_courante < periode:
+                periode_courante += 1
+                taux_revalo = taux_annuel_pour_periode(contexte.hypotheses, "revalorisation_immobiliere_annuelle", periode_courante)
+                valeur_bien *= 1 + taux_mensuel_compose(taux_revalo)
+            etats_incrementaux["valeur_bien"] = valeur_bien
 
         if periode == periode_achat and self._echeancier is None:
             lignes_achat, _ = self._preparer_financement(etat, contexte)
@@ -236,13 +241,13 @@ class ModuleResidencePrincipale(ModuleSimulation):
 
         index_emprunt = pd.PeriodIndex(echeancier["periode"], freq="M") if not echeancier.empty else pd.PeriodIndex([], freq="M")
         possede = pd.Series([periode >= periode_achat for periode in contexte.calendrier], index=contexte.calendrier, name="possede_residence_principale")
-        taux_revalo = taux_mensuel_compose(float(contexte.hypotheses.get("revalorisation_immobiliere_annuelle", 0.0)))
         valeur_bien = pd.Series(index=contexte.calendrier, dtype=float, name="valeur_bien")
-        for periode in contexte.calendrier:
-            if periode < periode_achat:
-                valeur_bien.loc[periode] = 0.0
-            else:
-                valeur_bien.loc[periode] = self.config.prix * ((1 + taux_revalo) ** (periode.ordinal - periode_achat.ordinal))
+        valeur_courante = float(self.config.prix)
+        for idx, periode in enumerate(contexte.calendrier):
+            if idx > 0:
+                taux_revalo = taux_annuel_pour_periode(contexte.hypotheses, "revalorisation_immobiliere_annuelle", periode)
+                valeur_courante *= 1 + taux_mensuel_compose(taux_revalo)
+            valeur_bien.loc[periode] = 0.0 if periode < periode_achat else valeur_courante
         etats = {
             "capital_restant_du": pd.Series(echeancier["capital_restant_du"].to_numpy(), index=index_emprunt, name="capital_restant_du"),
             "interets_payes": pd.Series(echeancier["interets_payes"].to_numpy(), index=index_emprunt, name="interets_payes"),
