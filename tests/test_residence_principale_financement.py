@@ -75,3 +75,27 @@ def test_rapport_contient_bourse_initiale(tmp_path: Path) -> None:
     assert resultat.metriques["cash_initial"] == 1000
     assert resultat.metriques["bourse_initiale"] == 3000
     assert resultat.metriques["bourse_finale"] == 3000
+
+
+def test_loyer_residence_principale_revalorise_au_premier_janvier(tmp_path: Path) -> None:
+    config = ConfigurationRacine.model_validate(
+        {
+            "simulation": {"date_debut": "2025-10", "date_fin": "2026-02"},
+            "hypotheses": {"indexation_loyers_annuelle": 0.12},
+            "portefeuille": {
+                "tresorerie_initiale": 10000,
+                "comptes": ["cash", "courtier"],
+                "taux_investissement_restant": 0.0,
+                "loyer_residence_principale": 1000,
+            },
+            "modules": [],
+        }
+    )
+
+    resultat = executer_simulation_depuis_config(config, tmp_path, generer_csv=False)
+    loyers = (
+        resultat.registre_df[resultat.registre_df["categorie"] == "loyer_residence_principale"]["flux_de_tresorerie"].tolist()
+    )
+
+    assert loyers[:3] == pytest.approx([-1000.0, -1000.0, -1000.0])
+    assert loyers[3:] == pytest.approx([-1120.0, -1120.0])

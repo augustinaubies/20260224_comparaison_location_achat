@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from ..configuration import ConfigurationModuleImmobilierLocatif
-from ..taux import taux_mensuel_compose
+from ..taux import facteur_revalorisation_annuelle, taux_mensuel_compose
 from .base import ContexteSimulation, ModuleSimulation, SortieModule
 from .emprunt import generer_echeancier
 
@@ -46,14 +46,17 @@ class ModuleImmobilierLocatif(ModuleSimulation):
         noi_liste: list[float] = []
         valeurs_bien: list[float] = []
 
-        taux_mensuel_loyer = taux_mensuel_compose(float(contexte.hypotheses.get("indexation_loyers_annuelle", 0.0)))
+        taux_annuel_loyer = float(contexte.hypotheses.get("indexation_loyers_annuelle", 0.0))
         taux_mensuel_revalo = taux_mensuel_compose(float(contexte.hypotheses.get("revalorisation_immobiliere_annuelle", 0.0)))
 
         for periode in periodes_location:
             mois_depuis_achat = max(0, periode.ordinal - periode_achat.ordinal)
             valeur_bien = self.config.prix * ((1 + taux_mensuel_revalo) ** mois_depuis_achat)
-            mois_depuis_debut_loc = max(0, periode.ordinal - debut_location.ordinal)
-            loyer_base = self.config.loyer_mensuel_initial * ((1 + taux_mensuel_loyer) ** mois_depuis_debut_loc)
+            loyer_base = self.config.loyer_mensuel_initial * facteur_revalorisation_annuelle(
+                periode,
+                debut_location,
+                taux_annuel_loyer,
+            )
             loyer = loyer_base * (1 - self.config.taux_vacance)
             entretien = valeur_bien * (self.config.taux_entretien_annuel / 12)
             gestion = loyer * self.config.taux_gestion_locative

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from simulation.configuration import ConfigurationEmpruntIntegree, ConfigurationModuleImmobilierLocatif
 from simulation.modules.base import ContexteSimulation
@@ -48,3 +49,39 @@ def test_locatif_registre_et_colonnes() -> None:
         "description",
     }
     assert colonnes_attendues.issubset(set(sortie.registre_lignes.columns))
+
+
+def test_locatif_loyer_revalorise_au_premier_janvier_et_valeur_bien_mensuelle() -> None:
+    config = ConfigurationModuleImmobilierLocatif(
+        id="loc_indexe",
+        type="immobilier_locatif",
+        date_achat="2025-10",
+        prix=100000,
+        apport=20000,
+        emprunt=ConfigurationEmpruntIntegree(
+            capital=80000,
+            taux_annuel=0.0,
+            duree_annees=10,
+            taux_assurance_annuel=0.0,
+        ),
+        loyer_mensuel_initial=1000,
+        date_debut_location="2025-10",
+        compte="cash",
+    )
+    calendrier = pd.period_range("2025-10", "2026-02", freq="M")
+    contexte = ContexteSimulation(
+        calendrier=calendrier,
+        hypotheses={
+            "indexation_loyers_annuelle": 0.12,
+            "revalorisation_immobiliere_annuelle": 0.12,
+        },
+        comptes=["cash"],
+    )
+
+    sortie = ModuleImmobilierLocatif(config).executer(contexte)
+    loyers = sortie.registre_lignes[sortie.registre_lignes["categorie"] == "loyer"]["flux_de_tresorerie"].tolist()
+    valeur_bien = sortie.etats["valeur_bien"]
+
+    assert loyers[:3] == pytest.approx([1000.0, 1000.0, 1000.0])
+    assert loyers[3:] == pytest.approx([1120.0, 1120.0])
+    assert valeur_bien.loc[pd.Period("2025-11", freq="M")] == pytest.approx(100000 * (1.12 ** (1 / 12)))

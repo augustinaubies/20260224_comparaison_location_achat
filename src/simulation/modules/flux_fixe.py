@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from ..configuration import ConfigurationModuleFluxFixe
-from ..taux import taux_mensuel_compose
+from ..taux import facteur_revalorisation_annuelle, taux_mensuel_compose
 from .base import ContexteSimulation, ModuleSimulation, SortieModule
 
 
@@ -51,7 +51,13 @@ class ModuleFluxFixe(ModuleSimulation):
         elif indexation == "indexation_loyer":
             taux_annuel = float(contexte.hypotheses.get("indexation_loyers_annuelle", 0.0))
 
-        taux_mensuel = taux_mensuel_compose(taux_annuel)
         periode_reference = pd.Period(self.config.periode_reference, freq="M") if self.config.periode_reference else debut_effectif
-        facteurs = [(1 + taux_mensuel) ** (periode.ordinal - periode_reference.ordinal) for periode in periodes]
+        if indexation in {"croissance_salaire", "indexation_loyer"}:
+            facteurs = [
+                facteur_revalorisation_annuelle(periode, periode_reference, taux_annuel)
+                for periode in periodes
+            ]
+        else:
+            taux_mensuel = taux_mensuel_compose(taux_annuel)
+            facteurs = [(1 + taux_mensuel) ** (periode.ordinal - periode_reference.ordinal) for periode in periodes]
         return pd.Series(self.config.montant, index=periodes, dtype=float) * pd.Series(facteurs, index=periodes, dtype=float)

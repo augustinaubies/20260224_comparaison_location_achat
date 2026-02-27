@@ -34,6 +34,7 @@ from .modules import (
 from .modules.base import ContexteSimulation, ModuleSimulation
 from .registre import COLONNES_REGISTRE, normaliser_registre
 from .resultat import ResultatSimulation
+from .taux import facteur_revalorisation_annuelle
 
 
 @dataclass(slots=True)
@@ -386,11 +387,13 @@ def executer_simulation_depuis_config(
                     appliquer_flux_cash(etat, -impot)
                     flux_net_mensuel -= impot
 
-        # Loyer de RP si pas propriétaire (indexé mensuellement)
+        # Loyer de RP si pas propriétaire (revalorisé annuellement au 1er janvier)
         if config.portefeuille.loyer_residence_principale > 0 and not etat.possessions.get("possede_rp", False):
-            taux_mensuel_loyer_rp = (1 + config.hypotheses.indexation_loyers_annuelle) ** (1 / 12) - 1
-            mois_ecoules = periode.ordinal - calendrier[0].ordinal
-            loyer_rp = config.portefeuille.loyer_residence_principale * ((1 + taux_mensuel_loyer_rp) ** mois_ecoules)
+            loyer_rp = config.portefeuille.loyer_residence_principale * facteur_revalorisation_annuelle(
+                periode,
+                calendrier[0],
+                config.hypotheses.indexation_loyers_annuelle,
+            )
             ligne_loyer_rp = {
                 "periode": periode,
                 "id_module": "loyer_residence_principale",

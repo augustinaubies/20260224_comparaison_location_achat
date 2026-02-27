@@ -55,6 +55,58 @@ def test_flux_fixe_indexation_inflation() -> None:
     assert flux[2] == pytest.approx(-(1200 * (1.12 ** (2 / 12))))
 
 
+def test_flux_fixe_croissance_salaire_revalorisee_au_premier_janvier() -> None:
+    config = ConfigurationModuleFluxFixe(
+        id="salaire_indexe",
+        type="flux_fixe",
+        debut="2025-10",
+        fin="2026-02",
+        montant=3000,
+        sens="revenu",
+        categorie="salaire",
+        compte="cash",
+        indexation="croissance_salaire",
+    )
+    calendrier = pd.period_range("2025-10", "2026-02", freq="M")
+    contexte = ContexteSimulation(
+        calendrier=calendrier,
+        hypotheses={"croissance_salaire_annuelle": 0.12},
+        comptes=["cash"],
+    )
+
+    sortie = ModuleFluxFixe(config).executer(contexte)
+    flux = sortie.registre_lignes["flux_de_tresorerie"].tolist()
+
+    assert flux[:3] == pytest.approx([3000.0, 3000.0, 3000.0])
+    assert flux[3:] == pytest.approx([3360.0, 3360.0])
+
+
+def test_flux_fixe_indexation_loyer_revalorisee_au_premier_janvier() -> None:
+    config = ConfigurationModuleFluxFixe(
+        id="loyer_indexe",
+        type="flux_fixe",
+        debut="2025-11",
+        fin="2026-02",
+        montant=1000,
+        sens="depense",
+        categorie="loyer",
+        compte="cash",
+        indexation="indexation_loyer",
+    )
+    calendrier = pd.period_range("2025-11", "2026-02", freq="M")
+    contexte = ContexteSimulation(
+        calendrier=calendrier,
+        hypotheses={"indexation_loyers_annuelle": 0.03},
+        comptes=["cash"],
+    )
+
+    sortie = ModuleFluxFixe(config).executer(contexte)
+    flux = sortie.registre_lignes["flux_de_tresorerie"].tolist()
+
+    assert flux[:2] == pytest.approx([-1000.0, -1000.0])
+    assert flux[2:] == pytest.approx([-1030.0, -1030.0])
+
+
 def test_flux_fixe_sans_bornes_utilise_calendrier_global() -> None:
     config = ConfigurationModuleFluxFixe(
         id="salaire",
