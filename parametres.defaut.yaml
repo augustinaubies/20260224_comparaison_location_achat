@@ -39,9 +39,21 @@ monte_carlo:
 portefeuille:
   tresorerie_initiale: 10000
   bourse_initiale: 0
-  comptes:
-  - cash
-  - courtier
+  comptes_definitions:
+  - id: cash
+    type: cash
+  - id: pea
+    type: pea
+  - id: courtier
+    type: cto
+  - id: pel
+    type: pel
+  - id: livret_a
+    type: livret
+    plafond_versement: 22950
+  - id: ldds
+    type: livret
+    plafond_versement: 12000
   taux_investissement_restant: 1.0
   id_module_investissement_restant: investissement_restant
   compte_investissement_restant: courtier
