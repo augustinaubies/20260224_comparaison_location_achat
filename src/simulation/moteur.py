@@ -327,7 +327,7 @@ def _desinvestir_pour_couvrir_cash_negatif(
                     "periode": periode,
                     "id_module": "investissement_restant",
                     "type_module": "investissement_restant",
-                    "flux_de_tresorerie": net,
+                    "flux_de_tresorerie": retrait_brut,
                     "categorie": "desinvestissement_compte",
                     "compte": "cash",
                     "description": f"Retrait depuis {compte_id}",
