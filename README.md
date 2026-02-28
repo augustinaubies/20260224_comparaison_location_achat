@@ -101,7 +101,6 @@ Règle de chargement:
 - `rendement_annuel_investissement_restant` (optionnel): override du rendement du sweep auto.
   - Si absent, utilise `hypotheses.rendement_marche`.
 - `id_module_investissement_restant`: identifiant de module utilisé dans le registre (`investissement_restant` par défaut).
-- `compte_investissement_restant`: compte de destination des versements (`courtier` par défaut).
 - `loyer_residence_principale`: loyer mensuel de RP tant qu'aucune RP n'est possédée.
 - `reste_a_vivre_minimum`: montant minimal conservé sur le compte courant avant sweep d'investissement.
 - `reste_a_vivre_mois_depenses`: multiple des sorties de trésorerie mensuelles à conserver en cash.
