@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+from pydantic import ValidationError
+
 from simulation.configuration import charger_configuration
 
 
-def test_module_dca_est_ignore_sans_erreur(tmp_path: Path) -> None:
+def test_module_dca_legacy_declenche_erreur_validation(tmp_path: Path) -> None:
     defaut = tmp_path / "defaut.yaml"
     utilisateur = tmp_path / "utilisateur.yaml"
     defaut.write_text(
@@ -25,6 +28,5 @@ modules:
     )
     utilisateur.write_text("{}", encoding="utf-8")
 
-    config = charger_configuration(defaut, utilisateur)
-
-    assert config.modules == []
+    with pytest.raises(ValidationError, match="investissement_dca"):
+        charger_configuration(defaut, utilisateur)
