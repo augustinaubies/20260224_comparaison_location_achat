@@ -31,6 +31,9 @@
       [] Ajouter la règle de blocage des versements PEA après premier retrait et modéliser la fiscalité des retraits selon l'ancienneté.
       [X] Modéliser les plafonds des livrets réglementés (au moins Livret A et LDDS) et leur absence de fiscalité.
         - Implémenté via `livret_reglemente` (`livret_a`/`ldds`/`lep`) avec plafonds par défaut et validation stricte de non-fiscalisation des sorties (fiscalité forcée à 0).
+      [] Détailler les règles PEL minimales (plafond, droits à prêt simplifiés) avant implémentation du prêt bonifié.
+  [X] Définir ensuite les logiques de priorisation, avec un paramétrage, qui alloue le montant à investir à la fin du mois dans le compte le plus prioritaire, et passe au suivant s'il reste des sous à investir après avoir tenté le premier (car il est plein, ne respecte plus certaines conditions, etc...).
+    - Implémenté via `portefeuille.priorites_allocation_investissement` : le sweep mensuel alloue maintenant le cash investissable en cascade selon la priorité, en respectant les plafonds de versement; le reliquat non allouable reste en cash.
       [X] Détailler les règles PEL minimales (plafond, droits à prêt simplifiés) avant implémentation du prêt bonifié.
         - Spécification rédigée dans `docs/regles_pel_minimales.md` (plafond, fiscalité simplifiée, drapeau d'éligibilité prêt et hors-périmètre explicite).
   [] Définir ensuite les logiques de priorisation, avec un paramétrage, qui alloue le montant à investir à la fin du mois dans le compte le plus prioritaire, et passe au suivant s'il reste des sous à investir après avoir tenté le premier (car il est plein, ne respecte plus certaines conditions, etc...).

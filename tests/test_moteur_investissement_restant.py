@@ -179,3 +179,73 @@ def test_impot_revenu_tranches_indexees_sur_inflation_variable() -> None:
     assert len(impot_constant) == 1
     assert len(impot_variable) == 1
     assert float(impot_variable.iloc[0]["flux_de_tresorerie"]) < float(impot_constant.iloc[0]["flux_de_tresorerie"])
+
+from simulation.configuration import charger_configuration
+from simulation.moteur import executer_simulation_depuis_config
+
+
+def test_investissement_restant_allocation_par_priorite_et_plafond(tmp_path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+hypotheses:
+  rendement_bourse_annuel: 0.0
+portefeuille:
+  tresorerie_initiale: 1000
+  taux_investissement_restant: 1.0
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: livret_a
+      type: livret
+      livret_reglemente: livret_a
+      plafond_versement: 200
+    - id: courtier
+      type: cto
+  priorites_allocation_investissement: [livret_a, courtier]
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+    resultat = executer_simulation_depuis_config(config, dossier_sortie=tmp_path / "sortie")
+
+    versements = resultat.registre_df[resultat.registre_df["categorie"] == "versement_restant"]
+    assert versements["compte"].tolist() == ["livret_a", "courtier"]
+    assert versements["flux_de_tresorerie"].tolist() == [-200.0, -800.0]
+
+
+def test_investissement_restant_reste_en_cash_si_aucune_allocation_possible(tmp_path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+hypotheses:
+  rendement_bourse_annuel: 0.0
+portefeuille:
+  tresorerie_initiale: 500
+  taux_investissement_restant: 1.0
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: livret_a
+      type: livret
+      livret_reglemente: livret_a
+      plafond_versement: 0
+  priorites_allocation_investissement: [livret_a]
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+    resultat = executer_simulation_depuis_config(config, dossier_sortie=tmp_path / "sortie")
+
+    assert resultat.registre_df[resultat.registre_df["categorie"] == "versement_restant"].empty
+    assert float(resultat.synthese_df.iloc[-1]["tresorerie_fin"]) == 500.0

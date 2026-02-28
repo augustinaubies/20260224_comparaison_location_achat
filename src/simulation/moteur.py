@@ -193,6 +193,32 @@ def _calculer_synthese_stateful(lignes_synthese: list[dict]) -> pd.DataFrame:
     return df[["periode", "flux_net", "solde_tresorerie", "tresorerie_debut", "tresorerie_fin", "valeur_bourse_fin"]]
 
 
+def _allouer_versement_selon_priorites(
+    montant_a_allouer: float,
+    priorites: list[str],
+    comptes_definitions: dict[str, object],
+    versements_cumules: dict[str, float],
+) -> dict[str, float]:
+    restant = max(float(montant_a_allouer), 0.0)
+    allocations: dict[str, float] = {}
+    for compte_id in priorites:
+        if restant <= 0:
+            break
+        definition = comptes_definitions.get(compte_id)
+        if definition is None or getattr(definition, "type", None) == "cash":
+            continue
+        plafond = getattr(definition, "plafond_versement", None)
+        capacite_restante = restant
+        if plafond is not None:
+            capacite_restante = max(float(plafond) - float(versements_cumules.get(compte_id, 0.0)), 0.0)
+        versement = min(restant, capacite_restante)
+        if versement <= 0:
+            continue
+        allocations[compte_id] = allocations.get(compte_id, 0.0) + versement
+        restant -= versement
+    return allocations
+
+
 def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path, generer_csv: bool = False) -> None:
     dossier_sortie.mkdir(parents=True, exist_ok=True)
     if generer_csv:
@@ -332,8 +358,9 @@ def executer_simulation_depuis_config(
         "D": [m for m in modules if m.type_module in {"residence_principale", "emprunt"}],
     }
 
-    comptes_bourse = {config.portefeuille.compte_investissement_restant}
-    comptes_tresorerie = determiner_comptes_tresorerie(config.portefeuille.comptes, comptes_bourse)
+    comptes_definitions = {compte.id: compte for compte in config.portefeuille.comptes_definitions}
+    comptes_investissement = {compte.id for compte in config.portefeuille.comptes_definitions if compte.type != "cash"}
+    comptes_tresorerie = determiner_comptes_tresorerie(config.portefeuille.comptes, comptes_investissement)
 
     lignes_registre: list[dict] = []
     lignes_synthese: list[dict] = []
@@ -343,6 +370,11 @@ def executer_simulation_depuis_config(
         cash=config.portefeuille.tresorerie_initiale,
         bourse=config.portefeuille.bourse_initiale,
     )
+    valeurs_comptes_investissement = {compte_id: 0.0 for compte_id in comptes_investissement}
+    compte_initial = config.portefeuille.compte_investissement_restant
+    if compte_initial in valeurs_comptes_investissement:
+        valeurs_comptes_investissement[compte_initial] = config.portefeuille.bourse_initiale
+    versements_cumules = {compte_id: 0.0 for compte_id in comptes_investissement}
 
     loyer_rp_courant = float(config.portefeuille.loyer_residence_principale)
     reste_a_vivre_minimum_courant = float(config.portefeuille.reste_a_vivre_minimum)
@@ -430,7 +462,9 @@ def executer_simulation_depuis_config(
 
         # F) Sweep investissement restant
         taux_bourse_annuel = contexte.taux_variable("rendement_bourse_annuel", periode)
-        appliquer_rendement_bourse(etat, taux_mensuel_compose(taux_bourse_annuel))
+        taux_bourse_mensuel = taux_mensuel_compose(taux_bourse_annuel)
+        for compte_id in valeurs_comptes_investissement:
+            valeurs_comptes_investissement[compte_id] *= 1 + taux_bourse_mensuel
         if config.portefeuille.indexer_reste_a_vivre_sur_inflation and idx > 0 and periode.month == 1:
             taux_inflation_annuel = contexte.taux_variable("inflation_annuelle", periode)
             reste_a_vivre_minimum_courant *= 1 + taux_inflation_annuel
@@ -438,8 +472,18 @@ def executer_simulation_depuis_config(
         reste_a_vivre_depenses = config.portefeuille.reste_a_vivre_mois_depenses * sorties_tresorerie_mensuelles
         reste_a_vivre_cible = max(reste_a_vivre_minimum, reste_a_vivre_depenses)
         cash_investissable = max(etat.cash - reste_a_vivre_cible, 0.0)
-        versement = appliquer_versement_bourse(etat, cash_investissable * config.portefeuille.taux_investissement_restant)
-        if versement > 0:
+        versement_total = appliquer_versement_bourse(etat, cash_investissable * config.portefeuille.taux_investissement_restant)
+        allocations = _allouer_versement_selon_priorites(
+            montant_a_allouer=versement_total,
+            priorites=config.portefeuille.priorites_allocation_investissement,
+            comptes_definitions=comptes_definitions,
+            versements_cumules=versements_cumules,
+        )
+        montant_alloue = 0.0
+        for compte, versement in allocations.items():
+            valeurs_comptes_investissement[compte] = valeurs_comptes_investissement.get(compte, 0.0) + versement
+            versements_cumules[compte] = versements_cumules.get(compte, 0.0) + versement
+            montant_alloue += versement
             lignes_registre.append(
                 {
                     "periode": periode,
@@ -447,11 +491,17 @@ def executer_simulation_depuis_config(
                     "type_module": "investissement_restant",
                     "flux_de_tresorerie": -versement,
                     "categorie": "versement_restant",
-                    "compte": "cash",
+                    "compte": compte,
                     "description": "Versement automatique du restant",
                 }
             )
-            flux_net_mensuel -= versement
+
+        if versement_total > montant_alloue:
+            appliquer_flux_cash(etat, versement_total - montant_alloue)
+
+        if montant_alloue > 0:
+            flux_net_mensuel -= montant_alloue
+        etat.bourse = float(sum(valeurs_comptes_investissement.values()))
         valeurs_etat_modules.setdefault(config.portefeuille.id_module_investissement_restant, {}).setdefault("valeur_bourse", []).append((periode, etat.bourse))
 
         # G) Clôture et invariants simples
