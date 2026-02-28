@@ -94,10 +94,47 @@ class ConfigurationMonteCarlo(BaseModel):
         }
 
 
+class ConfigurationComptePortefeuille(BaseModel):
+    id: str
+    type: Literal["cash", "pea", "cto", "pel", "livret"]
+    plafond_versement: float | None = Field(default=None, ge=0.0)
+    fiscalite_plus_value_sortie: float | None = Field(default=None, ge=0.0, le=1.0)
+    versements_autorises_apres_premier_retrait: bool = True
+    pret_immobilier_autorise: bool = False
+
+    @model_validator(mode="after")
+    def appliquer_regles_par_type(self) -> "ConfigurationComptePortefeuille":
+        if self.type == "pea":
+            if self.plafond_versement is None:
+                self.plafond_versement = 150000.0
+            if self.fiscalite_plus_value_sortie is None:
+                self.fiscalite_plus_value_sortie = 0.0
+            self.versements_autorises_apres_premier_retrait = False
+        elif self.type == "cto":
+            if self.fiscalite_plus_value_sortie is None:
+                self.fiscalite_plus_value_sortie = 0.30
+        elif self.type == "pel":
+            if self.plafond_versement is None:
+                self.plafond_versement = 61200.0
+            self.pret_immobilier_autorise = True
+            if self.fiscalite_plus_value_sortie is None:
+                self.fiscalite_plus_value_sortie = 0.0
+        elif self.type in {"livret", "cash"}:
+            if self.fiscalite_plus_value_sortie is None:
+                self.fiscalite_plus_value_sortie = 0.0
+        return self
+
+
 class ConfigurationPortefeuille(BaseModel):
     tresorerie_initiale: float = 0.0
     bourse_initiale: float = 0.0
     comptes: list[str] = Field(default_factory=lambda: ["cash", "courtier"])
+    comptes_definitions: list[ConfigurationComptePortefeuille] = Field(
+        default_factory=lambda: [
+            ConfigurationComptePortefeuille(id="cash", type="cash"),
+            ConfigurationComptePortefeuille(id="courtier", type="cto"),
+        ]
+    )
     taux_investissement_restant: float = Field(default=1.0, ge=0.0, le=1.0)
     id_module_investissement_restant: str = "investissement_restant"
     compte_investissement_restant: str = "courtier"
@@ -105,6 +142,23 @@ class ConfigurationPortefeuille(BaseModel):
     reste_a_vivre_minimum: float = Field(default=0.0, ge=0.0)
     reste_a_vivre_mois_depenses: float = Field(default=0.0, ge=0.0)
     indexer_reste_a_vivre_sur_inflation: bool = True
+
+    @field_validator("comptes_definitions")
+    @classmethod
+    def valider_ids_comptes_uniques(
+        cls,
+        comptes_definitions: list[ConfigurationComptePortefeuille],
+    ) -> list[ConfigurationComptePortefeuille]:
+        ids = [compte.id for compte in comptes_definitions]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Les ids de comptes doivent être uniques")
+        return comptes_definitions
+
+    @model_validator(mode="after")
+    def harmoniser_comptes_legacy(self) -> "ConfigurationPortefeuille":
+        if self.comptes_definitions:
+            self.comptes = [compte.id for compte in self.comptes_definitions]
+        return self
 
 
 class ConfigurationModuleBase(BaseModel):
