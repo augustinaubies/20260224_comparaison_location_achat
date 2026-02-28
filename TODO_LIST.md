@@ -49,5 +49,7 @@
   [X] Supprimer le support legacy du module `investissement_dca` (branche d'ignorance + fichier module obsolète non branché) pour éliminer une branche morte de configuration.
     - Le chargement de configuration ne filtre plus `investissement_dca` et le module obsolète a été retiré; une config legacy déclenche désormais une erreur de validation explicite.
   [X] Supprimer le couplage legacy entre `hypotheses` statiques et moyennes Monte Carlo : les tirages utilisent désormais uniquement `monte_carlo.distributions` pour éviter des branches mortes et des moyennes écrasées implicitement.
+  [X] Supprimer le support legacy du champ module `ville` (déprécié/ignoré) pour éliminer une branche morte de parsing de configuration.
+    - Le parsing ne retire plus silencieusement `ville` : les modules sont désormais stricts (`extra=forbid`) et une erreur de validation explicite est levée.
   [X] Il faut que les fonctions qui utilisent les paramètres variables n'aient pas l'information de comment les valeurs ont été obtenues. En effet, il faudra plus tard que les variables puissent suivre des lois de probabilités complexes, avec des correlations etc donc il faut que le workflow soit propre.
     - Introduit via `SourceTaux` + `ContexteSimulation.taux_variable(...)` : les modules/moteur consomment un accès uniforme aux taux sans connaître l'origine (constante, profil temporel, Monte Carlo).

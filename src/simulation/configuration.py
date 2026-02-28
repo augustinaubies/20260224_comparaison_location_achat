@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal
-import warnings
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator, model_validator
@@ -109,6 +108,7 @@ class ConfigurationPortefeuille(BaseModel):
 
 
 class ConfigurationModuleBase(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     id: str
     type: str
 
@@ -299,20 +299,4 @@ def charger_configuration(path_defaut: Path, path_utilisateur: Path) -> Configur
     donnees_utilisateur = charger_yaml(path_utilisateur)
     donnees_fusionnees = fusion_profonde(donnees_defaut, donnees_utilisateur)
     donnees_fusionnees = _resoudre_references_config(donnees_fusionnees, donnees_fusionnees)
-    modules = donnees_fusionnees.get("modules")
-    if isinstance(modules, list):
-        modules_filtres: list[dict] = []
-        for module in modules:
-            if not isinstance(module, dict):
-                modules_filtres.append(module)
-                continue
-            if "ville" in module:
-                warnings.warn(
-                    f"Le champ 'ville' du module '{module.get('id', 'sans_id')}' est déprécié et ignoré.",
-                    stacklevel=2,
-                )
-                module = dict(module)
-                module.pop("ville", None)
-            modules_filtres.append(module)
-        donnees_fusionnees["modules"] = modules_filtres
     return ConfigurationRacine.model_validate(donnees_fusionnees)
