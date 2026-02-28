@@ -18,22 +18,16 @@ Audit ciblé sur les champs de configuration définis dans `simulation` et leur 
 
 ### `simulation.devise`
 
-- **Statut : non utilisé dans le calcul**.
-- Le champ est présent dans le schéma et les fichiers YAML, mais aucune logique de calcul ne s'y branche actuellement.
-- Il peut néanmoins rester pertinent à court terme pour l'affichage / export (métadonnée de sortie).
+- **Statut : legacy supprimé**.
+- Le champ a été retiré du schéma `ConfigurationSimulation` et des fichiers YAML de paramètres/scénarios.
+- Toute présence résiduelle déclenche désormais une erreur de validation (`extra=forbid`).
 
 ### `simulation.pas_de_temps`
 
-- **Statut : non utilisé dans le calcul**.
-- Le moteur fonctionne en mensuel (index `Period[M]`) de manière structurelle.
-- Le schéma force déjà implicitement cette valeur à `"M"`.
+- **Statut : legacy supprimé**.
+- Le moteur restant structurellement mensuel, le champ a été retiré du schéma de configuration.
+- Toute présence résiduelle déclenche désormais une erreur de validation (`extra=forbid`).
 
 ## Recommandation
 
-Avant suppression de `devise` et/ou `pas_de_temps`, il faut trancher la stratégie de compatibilité configuration :
-
-1. suppression stricte immédiate (erreur de validation si champ présent),
-2. maintien temporaire avec dépréciation explicite,
-3. maintien comme métadonnées non bloquantes.
-
-Ce choix impacte la compatibilité des scénarios existants et doit donc être validé via une question utilisateur dédiée dans la TODO.
+Décision utilisateur appliquée : suppression stricte des deux champs non utilisés, sans phase de dépréciation.
