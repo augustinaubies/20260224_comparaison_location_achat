@@ -110,3 +110,26 @@ modules: []
 
     with pytest.raises(ValueError, match="non fiscalisés"):
         charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+
+
+def test_configuration_priorites_allocation_rejette_compte_inconnu(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+portefeuille:
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: pea
+      type: pea
+  priorites_allocation_investissement: [pea, inconnu]
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="comptes inconnus"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
