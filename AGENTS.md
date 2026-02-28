@@ -36,7 +36,7 @@ Lorsque l'agent n'est pas appelé spécifiquement pour réaliser une tâche non 
 - L'agent peut sélectionner librement une tâche qu’il estime faisable.
 - Si la tâche est peu claire ou demande un travail important, il est intéressant de la diviser en sous-tâches, et donc d'en créer de nouvelles pour traiter le problème petit à petit.
 - Les livrables d'une tâche ne sont pas forcément du code, tout dépend de la tâche.
-- Une fois terminée complètement, il la coche comme terminée '[X]'.
+- Une fois terminée complètement, il la coche comme terminée '[X]'. S'il identifie une tâche qui est déjà réalisée mais qui n'est pas notée comme terminée, alors il faut bien vérifier que tout est réspecté, et si c'est le cas, alors on peut la cocher comme terminée.
 - Un court commentaire technique peut être ajouté sous la tâche pour résumer l’implémentation.
 - Un setup complet de validation n'est pas nécessaire pour justifier la réalisation de tâches simples.
 
