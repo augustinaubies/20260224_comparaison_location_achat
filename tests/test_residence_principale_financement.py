@@ -51,7 +51,8 @@ def test_rp_financement_inclut_travaux_et_apport_depuis_cash_puis_bourse(tmp_pat
     assert achat[achat["categorie"] == "financement_apport_bourse"]["flux_de_tresorerie"].iloc[0] == pytest.approx(2500)
 
     # Coût finançable = 120000 ; apport 7500 ; emprunt attendu = 112500
-    flux_achat_hors_echeance = achat[achat["categorie"] != "echeance_emprunt"]["flux_de_tresorerie"].sum()
+    categories_achat = {"prix_achat", "frais_notaire", "frais_achat", "travaux", "financement_apport_cash", "financement_apport_bourse"}
+    flux_achat_hors_echeance = achat[achat["categorie"].isin(categories_achat)]["flux_de_tresorerie"].sum()
     assert flux_achat_hors_echeance == pytest.approx(-112500)
     assert not achat[achat["categorie"] == "echeance_emprunt"].empty
 
