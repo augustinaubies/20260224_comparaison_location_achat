@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from simulation.cli import application
@@ -139,3 +140,21 @@ portefeuille:
     assert config.portefeuille.tresorerie_initiale == 2500
     assert config.portefeuille.comptes == ["cash", "courtier"]
     assert config.hypotheses.inflation_annuelle == 0.02
+
+
+def test_configuration_rejette_anciennes_cles_hypotheses(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+hypotheses:
+  inflation: 0.02
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match=r"hypotheses\.inflation"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")

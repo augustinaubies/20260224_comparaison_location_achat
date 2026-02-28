@@ -6,7 +6,7 @@ from typing import Annotated, Literal
 import warnings
 
 import yaml
-from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator, model_validator
 
 
 class ConfigurationSimulation(BaseModel):
@@ -18,27 +18,12 @@ class ConfigurationSimulation(BaseModel):
 
 
 class ConfigurationHypotheses(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     inflation_annuelle: float | dict[str, float] = 0.0
     croissance_salaire_annuelle: float | dict[str, float] = 0.0
     indexation_loyers_annuelle: float | dict[str, float] = 0.0
     revalorisation_immobiliere_annuelle: float | dict[str, float] = 0.0
     rendement_bourse_annuel: float | dict[str, float] = 0.0
-
-    @model_validator(mode="before")
-    @classmethod
-    def normaliser_cles_legacy(cls, data: object) -> object:
-        if not isinstance(data, dict):
-            return data
-        normalise = dict(data)
-        correspondances = {
-            "inflation": "inflation_annuelle",
-            "croissance_salaire": "croissance_salaire_annuelle",
-            "rendement_marche": "rendement_bourse_annuel",
-        }
-        for cle_legacy, cle_nouvelle in correspondances.items():
-            if cle_legacy in normalise and cle_nouvelle not in normalise:
-                normalise[cle_nouvelle] = normalise.pop(cle_legacy)
-        return normalise
 
 
 
