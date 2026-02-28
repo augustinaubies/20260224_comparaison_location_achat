@@ -18,7 +18,11 @@ simulation:
   date_fin: "2025-03"
 portefeuille:
   tresorerie_initiale: 1000
-  comptes: ["cash", "courtier"]
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: courtier
+      type: cto
   taux_investissement_restant: 0.0
 modules:
   - id: "salaire"

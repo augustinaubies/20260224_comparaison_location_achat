@@ -148,9 +148,10 @@ class ConfigurationComptePortefeuille(BaseModel):
 
 
 class ConfigurationPortefeuille(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     tresorerie_initiale: float = 0.0
     bourse_initiale: float = 0.0
-    comptes: list[str] = Field(default_factory=lambda: ["cash", "courtier"])
     comptes_definitions: list[ConfigurationComptePortefeuille] = Field(
         default_factory=lambda: [
             ConfigurationComptePortefeuille(id="cash", type="cash"),
@@ -178,9 +179,7 @@ class ConfigurationPortefeuille(BaseModel):
         return comptes_definitions
 
     @model_validator(mode="after")
-    def harmoniser_comptes_legacy(self) -> "ConfigurationPortefeuille":
-        if self.comptes_definitions:
-            self.comptes = [compte.id for compte in self.comptes_definitions]
+    def valider_coherence_comptes(self) -> "ConfigurationPortefeuille":
         comptes_connus = {compte.id for compte in self.comptes_definitions}
         if not self.priorites_allocation_investissement:
             non_cash = [compte.id for compte in self.comptes_definitions if compte.type != "cash"]
@@ -193,6 +192,10 @@ class ConfigurationPortefeuille(BaseModel):
                 + ", ".join(sorted(inconnus))
             )
         return self
+
+    @property
+    def comptes(self) -> list[str]:
+        return [compte.id for compte in self.comptes_definitions]
 
 
 class ConfigurationModuleBase(BaseModel):

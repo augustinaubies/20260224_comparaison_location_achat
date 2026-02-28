@@ -59,3 +59,5 @@
     - Le parsing ne retire plus silencieusement `ville` : les modules sont désormais stricts (`extra=forbid`) et une erreur de validation explicite est levée.
   [X] Il faut que les fonctions qui utilisent les paramètres variables n'aient pas l'information de comment les valeurs ont été obtenues. En effet, il faudra plus tard que les variables puissent suivre des lois de probabilités complexes, avec des correlations etc donc il faut que le workflow soit propre.
     - Introduit via `SourceTaux` + `ContexteSimulation.taux_variable(...)` : les modules/moteur consomment un accès uniforme aux taux sans connaître l'origine (constante, profil temporel, Monte Carlo).
+  [X] Supprimer le champ legacy `portefeuille.comptes` au profit de `portefeuille.comptes_definitions` pour éliminer une redondance de configuration et ses branches mortes associées.
+    - `ConfigurationPortefeuille` est désormais stricte (`extra=forbid`) ; `comptes` n'est plus accepté en entrée et reste exposé en propriété dérivée depuis `comptes_definitions` pour compatibilité interne.

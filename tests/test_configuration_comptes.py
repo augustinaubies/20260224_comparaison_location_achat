@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from simulation.configuration import charger_configuration
 
@@ -132,4 +133,22 @@ modules: []
     )
 
     with pytest.raises(ValueError, match="comptes inconnus"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+
+
+def test_configuration_rejette_champ_legacy_comptes(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+portefeuille:
+  comptes: [cash, courtier]
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="portefeuille.comptes"):
         charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
