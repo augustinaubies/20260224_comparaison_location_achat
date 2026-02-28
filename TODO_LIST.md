@@ -19,7 +19,17 @@
    - Implémenté via `duree_annees` dans la configuration, avec compatibilité legacy `duree_mois` (conversion uniquement si multiple de 12).
 [] Modéliser les comptes PEA, PEL, livrets, CTO avec pour le moment chacun leur valeur limite et leur fonctionnement propre (plus de versements après le premier retrait du PEA, Emprunt possible lors d'achat avec le PEL, rien de particulier pour les livrets). Il faut que chacun soit imposé de la bonne manière (rien sur PEA et livrets, 30% flat sur le CTO). Il faut avoir un système de priorité sur les allocations : le reste à investir est alloué en fonction de ça. Et si rien n'est possible alors ça reste sur le compte courant.
   [] Il faut déjà modéliser tous les types de comptes : PEA, CTO, PEL, livrets, cash : leur fiscalité, limites et conditions d'utilisation, logiques particulières (plus de versement possible après le premier retrait du PEA). Il faut que leur paramétrage soit mis dans le fichier de paramétrage par défaut, intégrés dans le workflow des tirages MCs si nécessaire etc.
-  [] Identifier si certains comptes nécessitent des logiques particulières et donc de rajouter des tâches dans la TODO pour gérer leur spécificité.
+  [X] Identifier si certains comptes nécessitent des logiques particulières et donc de rajouter des tâches dans la TODO pour gérer leur spécificité.
+    - Analyse effectuée :
+      - **PEA** : plafond de versement, blocage des nouveaux versements après premier retrait, fiscalité des retraits (cas avant/après 5 ans).
+      - **CTO** : suivi des plus-values réalisées (PRU / lots) pour appliquer correctement la flat tax sur les sorties.
+      - **PEL** : plafond de versement, logique de droits à prêt et conditions d'utilisation lors d'un achat immobilier.
+      - **Livrets réglementés** : plafonds par produit (Livret A/LDDS/LEP) et intérêts non fiscalisés.
+    - Sous-tâches ajoutées pour couvrir ces besoins spécifiques :
+      [] Implémenter le suivi des lots/PRU sur CTO pour fiscaliser uniquement les plus-values réalisées lors des retraits.
+      [] Ajouter la règle de blocage des versements PEA après premier retrait et modéliser la fiscalité des retraits selon l'ancienneté.
+      [] Modéliser les plafonds des livrets réglementés (au moins Livret A et LDDS) et leur absence de fiscalité.
+      [] Détailler les règles PEL minimales (plafond, droits à prêt simplifiés) avant implémentation du prêt bonifié.
   [] Définir ensuite les logiques de priorisation, avec un paramétrage, qui alloue le montant à investir à la fin du mois dans le compte le plus prioritaire, et passe au suivant s'il reste des sous à investir après avoir tenté le premier (car il est plein, ne respecte plus certaines conditions, etc...).
   [] Il faut que l'imposition de toutes les sorties de ces comptes soit correcte : par exemple 30% flat tax sur les plus values pour le CTO, la CSG à 17% sur les plus values du PEA, rien sur les livrets, prêt à taux intéressant avec le PEL.
 [X] Faire en sorte que tous les facteurs (inflation, croissance des salaires, loyers, logements etc) ne soient pas considérés comme des constantes dans le code. En effet, l'objectif sera plus tard de faire des tirages aléatoires de tous ces paramètres. Il faut donc utiliser dans toutes les fonctions utilisatrices le facteur actuel. Et il faut donc corriger les fonctions qui calculent leur valeur actuelle en fonction de la valeur intiale avec un facteur constant : en effet on doit calculer la prochaine valeur à partir uniquement de la précédente et du facteur actuel à appliquer.
