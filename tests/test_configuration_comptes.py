@@ -154,19 +154,48 @@ modules: []
         charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
 
 
-def test_configuration_rejette_champ_legacy_compte_investissement_restant(tmp_path: Path) -> None:
+def test_configuration_rejette_duree_mois_legacy_module_emprunt(tmp_path: Path) -> None:
     defaut = tmp_path / "parametres.defaut.yaml"
     defaut.write_text(
         """
 simulation:
   date_debut: "2025-01"
-  date_fin: "2025-01"
-portefeuille:
-  compte_investissement_restant: courtier
-modules: []
+  date_fin: "2025-12"
+modules:
+  - id: credit
+    type: emprunt
+    date_debut: "2025-01"
+    capital: 100000
+    taux_annuel: 0.03
+    duree_mois: 240
 """.strip(),
         encoding="utf-8",
     )
 
-    with pytest.raises(ValidationError, match="compte_investissement_restant"):
+    with pytest.raises(ValidationError, match="modules.0.emprunt.duree_mois"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+
+
+def test_configuration_rejette_duree_mois_legacy_emprunt_integre(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-12"
+modules:
+  - id: rp
+    type: residence_principale
+    date_achat: "2025-01"
+    prix: 200000
+    taux_frais_notaire: 0.08
+    apport: 20000
+    emprunt:
+      taux_annuel: 0.03
+      duree_mois: 300
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="modules.0.residence_principale.emprunt.duree_mois"):
         charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")

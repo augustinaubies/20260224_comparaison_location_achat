@@ -225,37 +225,13 @@ class ConfigurationModuleEmprunt(ConfigurationModuleBase):
     taux_assurance_annuel: float = Field(default=0.0, ge=0.0)
     compte: str = "cash"
 
-    @model_validator(mode="before")
-    @classmethod
-    def normaliser_duree_legacy(cls, data: object) -> object:
-        if not isinstance(data, dict):
-            return data
-        normalise = dict(data)
-        if "duree_annees" not in normalise and "duree_mois" in normalise:
-            duree_mois = normalise.pop("duree_mois")
-            if int(duree_mois) % 12 != 0:
-                raise ValueError("La durée legacy en mois doit être un multiple de 12")
-            normalise["duree_annees"] = int(duree_mois) // 12
-        return normalise
-
 
 class ConfigurationEmpruntIntegree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     taux_annuel: float = Field(ge=0.0)
     duree_annees: PositiveInt
     taux_assurance_annuel: float = Field(default=0.0, ge=0.0)
-
-    @model_validator(mode="before")
-    @classmethod
-    def normaliser_duree_legacy(cls, data: object) -> object:
-        if not isinstance(data, dict):
-            return data
-        normalise = dict(data)
-        if "duree_annees" not in normalise and "duree_mois" in normalise:
-            duree_mois = normalise.pop("duree_mois")
-            if int(duree_mois) % 12 != 0:
-                raise ValueError("La durée legacy en mois doit être un multiple de 12")
-            normalise["duree_annees"] = int(duree_mois) // 12
-        return normalise
 
 
 class ConfigurationModuleImmobilierLocatif(ConfigurationModuleBase):

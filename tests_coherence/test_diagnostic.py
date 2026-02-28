@@ -36,7 +36,7 @@ modules:
     date_debut: "2025-01"
     capital: 120000
     taux_annuel: 0.03
-    duree_mois: 240
+    duree_annees: 20
     compte: "cash"
 """.strip(),
         encoding="utf-8",
