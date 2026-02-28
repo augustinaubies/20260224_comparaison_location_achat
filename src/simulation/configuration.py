@@ -9,10 +9,10 @@ from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator,
 
 
 class ConfigurationSimulation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     date_debut: str
     date_fin: str
-    devise: str = "EUR"
-    pas_de_temps: Literal["M"] = "M"
     mois_paiement_impot_revenu: int = Field(default=9, ge=1, le=12)
 
 

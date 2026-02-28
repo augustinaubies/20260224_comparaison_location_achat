@@ -1,8 +1,6 @@
 simulation:
   date_debut: 2025-01
   date_fin: 2037-12
-  devise: EUR
-  pas_de_temps: M
 hypotheses:
   inflation_annuelle: 0.03
   croissance_salaire_annuelle: 0.02

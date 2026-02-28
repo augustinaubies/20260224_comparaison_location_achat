@@ -200,3 +200,37 @@ modules:
 
     with pytest.raises(ValidationError, match="modules.0.residence_principale.emprunt.duree_mois"):
         charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+
+
+def test_configuration_rejette_champ_legacy_simulation_devise(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+  devise: EUR
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="simulation.devise"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+
+
+def test_configuration_rejette_champ_legacy_simulation_pas_de_temps(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+  pas_de_temps: M
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="simulation.pas_de_temps"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
