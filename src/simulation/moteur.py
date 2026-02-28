@@ -506,8 +506,11 @@ def executer_simulation_depuis_config(
         bourse=config.portefeuille.bourse_initiale,
     )
     valeurs_comptes_investissement = {compte_id: 0.0 for compte_id in comptes_investissement}
-    compte_initial = config.portefeuille.compte_investissement_restant
-    if compte_initial in valeurs_comptes_investissement:
+    compte_initial = next(
+        (compte for compte in config.portefeuille.priorites_allocation_investissement if compte in valeurs_comptes_investissement),
+        None,
+    )
+    if compte_initial is not None and compte_initial in valeurs_comptes_investissement:
         valeurs_comptes_investissement[compte_initial] = config.portefeuille.bourse_initiale
     versements_cumules = {compte_id: 0.0 for compte_id in comptes_investissement}
     couts_revient_comptes = {compte_id: 0.0 for compte_id in comptes_investissement}
@@ -518,7 +521,7 @@ def executer_simulation_depuis_config(
         for compte_id, definition in comptes_definitions.items()
         if getattr(definition, "type", None) == "cto"
     }
-    if compte_initial in couts_revient_comptes:
+    if compte_initial is not None and compte_initial in couts_revient_comptes:
         couts_revient_comptes[compte_initial] = config.portefeuille.bourse_initiale
         dates_premier_versement[compte_initial] = calendrier[0]
         if getattr(comptes_definitions.get(compte_initial), "type", None) == "cto" and config.portefeuille.bourse_initiale > 0:
