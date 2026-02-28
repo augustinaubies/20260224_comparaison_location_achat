@@ -68,3 +68,6 @@
     - Les schémas rejettent désormais explicitement `duree_mois` (module emprunt et emprunt intégré immobilier), ce qui supprime la normalisation legacy silencieuse.
   [X] Supprimer le champ legacy `portefeuille.compte_investissement_restant` désormais redondant avec `priorites_allocation_investissement`.
     - Le compte d'initialisation de `bourse_initiale` est désormais le premier compte d'investissement prioritaire, et la configuration rejette explicitement l'ancien champ.
+  [X] Auditer les champs de configuration `simulation` potentiellement legacy/inutilisés (`devise`, `pas_de_temps`) pour préparer leur nettoyage.
+    - Audit réalisé dans `docs/diagnostic_parametres_legacy.md` : `mois_paiement_impot_revenu` est utilisé, tandis que `devise` et `pas_de_temps` sont actuellement des métadonnées non consommées par le moteur.
+  [] Question utilisateur : pour `simulation.devise` et `simulation.pas_de_temps`, faut-il les supprimer strictement (validation en erreur), les déprécier temporairement, ou les conserver comme métadonnées ?
