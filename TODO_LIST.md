@@ -31,7 +31,8 @@
       [] Ajouter la règle de blocage des versements PEA après premier retrait et modéliser la fiscalité des retraits selon l'ancienneté.
       [X] Modéliser les plafonds des livrets réglementés (au moins Livret A et LDDS) et leur absence de fiscalité.
         - Implémenté via `livret_reglemente` (`livret_a`/`ldds`/`lep`) avec plafonds par défaut et validation stricte de non-fiscalisation des sorties (fiscalité forcée à 0).
-      [] Détailler les règles PEL minimales (plafond, droits à prêt simplifiés) avant implémentation du prêt bonifié.
+      [X] Détailler les règles PEL minimales (plafond, droits à prêt simplifiés) avant implémentation du prêt bonifié.
+        - Spécification rédigée dans `docs/regles_pel_minimales.md` (plafond, fiscalité simplifiée, drapeau d'éligibilité prêt et hors-périmètre explicite).
   [] Définir ensuite les logiques de priorisation, avec un paramétrage, qui alloue le montant à investir à la fin du mois dans le compte le plus prioritaire, et passe au suivant s'il reste des sous à investir après avoir tenté le premier (car il est plein, ne respecte plus certaines conditions, etc...).
   [] Il faut que l'imposition de toutes les sorties de ces comptes soit correcte : par exemple 30% flat tax sur les plus values pour le CTO, la CSG à 17% sur les plus values du PEA, rien sur les livrets, prêt à taux intéressant avec le PEL.
 [X] Faire en sorte que tous les facteurs (inflation, croissance des salaires, loyers, logements etc) ne soient pas considérés comme des constantes dans le code. En effet, l'objectif sera plus tard de faire des tirages aléatoires de tous ces paramètres. Il faut donc utiliser dans toutes les fonctions utilisatrices le facteur actuel. Et il faut donc corriger les fonctions qui calculent leur valeur actuelle en fonction de la valeur intiale avec un facteur constant : en effet on doit calculer la prochaine valeur à partir uniquement de la précédente et du facteur actuel à appliquer.
