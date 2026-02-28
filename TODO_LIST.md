@@ -65,3 +65,5 @@
     - `ConfigurationPortefeuille` est désormais stricte (`extra=forbid`) ; `comptes` n'est plus accepté en entrée et reste exposé en propriété dérivée depuis `comptes_definitions` pour compatibilité interne.
   [X] Supprimer le support legacy `duree_mois` dans les configurations d'emprunt pour éliminer la branche de conversion implicite vers `duree_annees`.
     - Les schémas rejettent désormais explicitement `duree_mois` (module emprunt et emprunt intégré immobilier), ce qui supprime la normalisation legacy silencieuse.
+  [X] Supprimer le champ legacy `portefeuille.compte_investissement_restant` désormais redondant avec `priorites_allocation_investissement`.
+    - Le compte d'initialisation de `bourse_initiale` est désormais le premier compte d'investissement prioritaire, et la configuration rejette explicitement l'ancien champ.

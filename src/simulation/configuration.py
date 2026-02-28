@@ -160,7 +160,6 @@ class ConfigurationPortefeuille(BaseModel):
     )
     taux_investissement_restant: float = Field(default=1.0, ge=0.0, le=1.0)
     id_module_investissement_restant: str = "investissement_restant"
-    compte_investissement_restant: str = "courtier"
     priorites_allocation_investissement: list[str] = Field(default_factory=list)
     loyer_residence_principale: float = Field(default=0.0, ge=0.0)
     reste_a_vivre_minimum: float = Field(default=0.0, ge=0.0)
@@ -183,7 +182,7 @@ class ConfigurationPortefeuille(BaseModel):
         comptes_connus = {compte.id for compte in self.comptes_definitions}
         if not self.priorites_allocation_investissement:
             non_cash = [compte.id for compte in self.comptes_definitions if compte.type != "cash"]
-            self.priorites_allocation_investissement = non_cash or [self.compte_investissement_restant]
+            self.priorites_allocation_investissement = non_cash
 
         inconnus = [compte for compte in self.priorites_allocation_investissement if compte not in comptes_connus]
         if inconnus:

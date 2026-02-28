@@ -351,7 +351,6 @@ hypotheses:
 portefeuille:
   tresorerie_initiale: 0
   bourse_initiale: 200
-  compte_investissement_restant: pea
   taux_investissement_restant: 1.0
   comptes_definitions:
     - id: cash
