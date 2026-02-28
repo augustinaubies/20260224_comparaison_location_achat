@@ -38,6 +38,7 @@ modules: []
     assert comptes["pea_perso"].versements_autorises_apres_premier_retrait is False
     assert comptes["cto_perso"].fiscalite_plus_value_sortie == pytest.approx(0.30)
     assert comptes["pel_perso"].pret_immobilier_autorise is True
+    assert comptes["pel_perso"].taux_pret_immobilier_annuel == pytest.approx(0.02)
 
 
 def test_configuration_comptes_definitions_rejette_ids_dupliques(tmp_path: Path) -> None:

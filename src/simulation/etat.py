@@ -19,6 +19,8 @@ class EtatSimulation:
     loyers_imposables_annee_en_cours: float = 0.0
     bases_annuelles_impot: dict[int, dict[str, float]] = field(default_factory=dict)
     etats_modules: dict[str, dict[str, Any]] = field(default_factory=dict)
+    comptes_investissement: dict[str, float] = field(default_factory=dict)
+    comptes_definitions: dict[str, Any] = field(default_factory=dict)
 
 
 def appliquer_flux_cash(etat: EtatSimulation, montant: float) -> None:

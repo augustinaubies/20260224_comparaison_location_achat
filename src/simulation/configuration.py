@@ -102,6 +102,7 @@ class ConfigurationComptePortefeuille(BaseModel):
     fiscalite_plus_value_sortie: float | None = Field(default=None, ge=0.0, le=1.0)
     versements_autorises_apres_premier_retrait: bool = True
     pret_immobilier_autorise: bool = False
+    taux_pret_immobilier_annuel: float | None = Field(default=None, ge=0.0)
 
     @model_validator(mode="after")
     def appliquer_regles_par_type(self) -> "ConfigurationComptePortefeuille":
@@ -123,6 +124,8 @@ class ConfigurationComptePortefeuille(BaseModel):
             self.pret_immobilier_autorise = True
             if self.fiscalite_plus_value_sortie is None:
                 self.fiscalite_plus_value_sortie = 0.0
+            if self.taux_pret_immobilier_annuel is None:
+                self.taux_pret_immobilier_annuel = 0.02
         elif self.type == "livret":
             if self.livret_reglemente is None:
                 if self.id == "livret_a":

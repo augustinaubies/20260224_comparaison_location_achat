@@ -137,3 +137,53 @@ def test_reste_a_vivre_limite_investissement_automatique(tmp_path: Path) -> None
 
     assert versements == pytest.approx([-500.0])
     assert resultat.synthese_df.iloc[-1]["tresorerie_fin"] == pytest.approx(1000.0)
+
+
+def test_rp_utilise_pret_pel_si_disponible(tmp_path: Path) -> None:
+    config = ConfigurationRacine.model_validate(
+        {
+            "simulation": {"date_debut": "2025-01", "date_fin": "2025-03"},
+            "hypotheses": {"rendement_bourse_annuel": 0.0},
+            "portefeuille": {
+                "tresorerie_initiale": 0,
+                "bourse_initiale": 50000,
+                "comptes_definitions": [
+                    {"id": "cash", "type": "cash"},
+                    {"id": "pel", "type": "pel", "taux_pret_immobilier_annuel": 0.01},
+                ],
+                "priorites_allocation_investissement": ["pel"],
+                "taux_investissement_restant": 0.0,
+            },
+            "modules": [
+                {
+                    "id": "rp",
+                    "type": "residence_principale",
+                    "date_achat": "2025-01",
+                    "prix": 100000,
+                    "taux_frais_notaire": 0.0,
+                    "frais_achat": 0.0,
+                    "taux_travaux": 0.0,
+                    "apport": 0,
+                    "taux_apport_patrimoine_financier": 0.0,
+                    "emprunt": {
+                        "taux_annuel": 0.05,
+                        "duree_annees": 20,
+                        "taux_assurance_annuel": 0.0,
+                    },
+                    "taxe_fonciere_annuelle": 0,
+                    "compte": "cash",
+                }
+            ],
+        }
+    )
+
+    resultat = executer_simulation_depuis_config(config, tmp_path, generer_csv=False)
+    registre = resultat.registre_df
+
+    lignes_pel = registre[(registre["periode"].astype(str) == "2025-01") & (registre["categorie"] == "financement_pret_pel")]
+    assert len(lignes_pel) == 1
+    assert float(lignes_pel.iloc[0]["flux_de_tresorerie"]) == pytest.approx(50000.0)
+
+    echeances = registre[registre["categorie"] == "echeance_emprunt"]
+    assert not echeances.empty
+    assert float(echeances.iloc[0]["flux_de_tresorerie"]) > -660.0

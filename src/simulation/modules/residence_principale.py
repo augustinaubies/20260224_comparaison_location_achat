@@ -23,6 +23,77 @@ class ModuleResidencePrincipale(ModuleSimulation):
         travaux = self.config.prix * self.config.taux_travaux
         return self.config.prix + frais_notaire + self.config.frais_achat + travaux
 
+    def _determiner_pret_pel(self, etat: EtatSimulation, capital_emprunte: float) -> tuple[str | None, float, float]:
+        compte_selectionne: str | None = None
+        montant_selectionne = 0.0
+        taux_selectionne = self.config.emprunt.taux_annuel
+
+        for compte_id, definition in etat.comptes_definitions.items():
+            if getattr(definition, "type", None) != "pel":
+                continue
+            if not bool(getattr(definition, "pret_immobilier_autorise", False)):
+                continue
+
+            encours_pel = max(float(etat.comptes_investissement.get(compte_id, 0.0)), 0.0)
+            montant_pret = min(capital_emprunte, encours_pel)
+            if montant_pret <= montant_selectionne:
+                continue
+
+            compte_selectionne = compte_id
+            montant_selectionne = montant_pret
+            taux_selectionne = float(
+                getattr(definition, "taux_pret_immobilier_annuel", self.config.emprunt.taux_annuel)
+                or self.config.emprunt.taux_annuel
+            )
+
+        return compte_selectionne, montant_selectionne, taux_selectionne
+
+    def _generer_echeancier_global(self, etat: EtatSimulation, contexte: ContexteSimulation) -> tuple[pd.DataFrame, list[dict]]:
+        compte_pel, capital_pel, taux_pel = self._determiner_pret_pel(etat, self._capital_emprunte)
+        capital_bancaire = max(self._capital_emprunte - capital_pel, 0.0)
+
+        lignes_financement: list[dict] = []
+        if capital_pel > 0 and compte_pel is not None:
+            lignes_financement.append(
+                {
+                    "periode": pd.Period(self.config.date_achat, freq="M"),
+                    "id_module": self.id_module,
+                    "type_module": self.type_module,
+                    "flux_de_tresorerie": capital_pel,
+                    "categorie": "financement_pret_pel",
+                    "compte": self.config.compte,
+                    "description": f"Prêt immobilier adossé au PEL ({compte_pel})",
+                }
+            )
+
+        echeanciers: list[pd.DataFrame] = []
+        if capital_bancaire > 0:
+            echeanciers.append(
+                generer_echeancier(
+                    capital=capital_bancaire,
+                    taux_annuel=self.config.emprunt.taux_annuel,
+                    duree_mois=self.config.emprunt.duree_annees * 12,
+                    date_debut=self.config.date_achat,
+                    calendrier_global=contexte.calendrier,
+                )
+            )
+        if capital_pel > 0:
+            echeanciers.append(
+                generer_echeancier(
+                    capital=capital_pel,
+                    taux_annuel=taux_pel,
+                    duree_mois=self.config.emprunt.duree_annees * 12,
+                    date_debut=self.config.date_achat,
+                    calendrier_global=contexte.calendrier,
+                )
+            )
+
+        if not echeanciers:
+            return pd.DataFrame(), lignes_financement
+
+        echeancier = pd.concat(echeanciers).groupby("periode", as_index=False).sum(numeric_only=True)
+        return echeancier, lignes_financement
+
     def _preparer_financement(self, etat: EtatSimulation, contexte: ContexteSimulation) -> tuple[list[dict], float]:
         lignes: list[dict] = []
         periode_achat = pd.Period(self.config.date_achat, freq="M")
@@ -115,13 +186,8 @@ class ModuleResidencePrincipale(ModuleSimulation):
             lignes_achat, _ = self._preparer_financement(etat, contexte)
             lignes.extend(lignes_achat)
             if self._capital_emprunte > 0:
-                self._echeancier = generer_echeancier(
-                    capital=self._capital_emprunte,
-                    taux_annuel=self.config.emprunt.taux_annuel,
-                    duree_mois=self.config.emprunt.duree_annees * 12,
-                    date_debut=self.config.date_achat,
-                    calendrier_global=contexte.calendrier,
-                )
+                self._echeancier, lignes_financement = self._generer_echeancier_global(etat, contexte)
+                lignes.extend(lignes_financement)
             else:
                 self._echeancier = pd.DataFrame()
 
