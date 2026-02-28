@@ -306,12 +306,6 @@ def charger_configuration(path_defaut: Path, path_utilisateur: Path) -> Configur
             if not isinstance(module, dict):
                 modules_filtres.append(module)
                 continue
-            if module.get("type") == "investissement_dca":
-                warnings.warn(
-                    "Le module 'investissement_dca' est déprécié et ignoré: utilisez uniquement l'investissement du restant.",
-                    stacklevel=2,
-                )
-                continue
             if "ville" in module:
                 warnings.warn(
                     f"Le champ 'ville' du module '{module.get('id', 'sans_id')}' est déprécié et ignoré.",
