@@ -97,6 +97,7 @@ class ConfigurationMonteCarlo(BaseModel):
 class ConfigurationComptePortefeuille(BaseModel):
     id: str
     type: Literal["cash", "pea", "cto", "pel", "livret"]
+    livret_reglemente: Literal["livret_a", "ldds", "lep"] | None = None
     plafond_versement: float | None = Field(default=None, ge=0.0)
     fiscalite_plus_value_sortie: float | None = Field(default=None, ge=0.0, le=1.0)
     versements_autorises_apres_premier_retrait: bool = True
@@ -104,6 +105,9 @@ class ConfigurationComptePortefeuille(BaseModel):
 
     @model_validator(mode="after")
     def appliquer_regles_par_type(self) -> "ConfigurationComptePortefeuille":
+        if self.type != "livret" and self.livret_reglemente is not None:
+            raise ValueError("Le champ 'livret_reglemente' est réservé aux comptes de type 'livret'")
+
         if self.type == "pea":
             if self.plafond_versement is None:
                 self.plafond_versement = 150000.0
@@ -119,7 +123,25 @@ class ConfigurationComptePortefeuille(BaseModel):
             self.pret_immobilier_autorise = True
             if self.fiscalite_plus_value_sortie is None:
                 self.fiscalite_plus_value_sortie = 0.0
-        elif self.type in {"livret", "cash"}:
+        elif self.type == "livret":
+            if self.livret_reglemente is None:
+                if self.id == "livret_a":
+                    self.livret_reglemente = "livret_a"
+                elif self.id == "ldds":
+                    self.livret_reglemente = "ldds"
+
+            if self.livret_reglemente == "livret_a" and self.plafond_versement is None:
+                self.plafond_versement = 22950.0
+            elif self.livret_reglemente == "ldds" and self.plafond_versement is None:
+                self.plafond_versement = 12000.0
+            elif self.livret_reglemente == "lep" and self.plafond_versement is None:
+                self.plafond_versement = 10000.0
+
+            if self.fiscalite_plus_value_sortie is None:
+                self.fiscalite_plus_value_sortie = 0.0
+            if self.fiscalite_plus_value_sortie != 0.0:
+                raise ValueError("Les livrets réglementés doivent rester non fiscalisés en sortie")
+        elif self.type == "cash":
             if self.fiscalite_plus_value_sortie is None:
                 self.fiscalite_plus_value_sortie = 0.0
         return self

@@ -59,3 +59,54 @@ modules: []
 
     with pytest.raises(ValueError, match="ids de comptes"):
         charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+
+
+def test_configuration_livrets_reglementes_defaut_plafonds_et_fiscalite(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+portefeuille:
+  comptes_definitions:
+    - id: livret_a
+      type: livret
+      livret_reglemente: livret_a
+    - id: ldds
+      type: livret
+      livret_reglemente: ldds
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+    comptes = {compte.id: compte for compte in config.portefeuille.comptes_definitions}
+
+    assert comptes["livret_a"].plafond_versement == 22950.0
+    assert comptes["livret_a"].fiscalite_plus_value_sortie == 0.0
+    assert comptes["ldds"].plafond_versement == 12000.0
+    assert comptes["ldds"].fiscalite_plus_value_sortie == 0.0
+
+
+def test_configuration_rejette_fiscalite_livret_non_nulle(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+portefeuille:
+  comptes_definitions:
+    - id: livret_a
+      type: livret
+      livret_reglemente: livret_a
+      fiscalite_plus_value_sortie: 0.15
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="non fiscalisés"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
