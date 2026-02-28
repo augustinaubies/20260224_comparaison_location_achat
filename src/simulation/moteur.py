@@ -198,6 +198,7 @@ def _allouer_versement_selon_priorites(
     priorites: list[str],
     comptes_definitions: dict[str, object],
     versements_cumules: dict[str, float],
+    retraits_effectues: dict[str, bool] | None = None,
 ) -> dict[str, float]:
     restant = max(float(montant_a_allouer), 0.0)
     allocations: dict[str, float] = {}
@@ -206,6 +207,12 @@ def _allouer_versement_selon_priorites(
             break
         definition = comptes_definitions.get(compte_id)
         if definition is None or getattr(definition, "type", None) == "cash":
+            continue
+        if (
+            retraits_effectues
+            and retraits_effectues.get(compte_id, False)
+            and not getattr(definition, "versements_autorises_apres_premier_retrait", True)
+        ):
             continue
         plafond = getattr(definition, "plafond_versement", None)
         capacite_restante = restant
@@ -217,6 +224,134 @@ def _allouer_versement_selon_priorites(
         allocations[compte_id] = allocations.get(compte_id, 0.0) + versement
         restant -= versement
     return allocations
+
+
+def _calculer_retrait_et_plus_value(
+    compte_id: str,
+    montant_brut: float,
+    definition: object,
+    valeurs_comptes_investissement: dict[str, float],
+    couts_revient: dict[str, float],
+    lots_cto: dict[str, list[dict[str, float]]],
+) -> tuple[float, float]:
+    valeur_avant = max(float(valeurs_comptes_investissement.get(compte_id, 0.0)), 0.0)
+    retrait_brut = min(max(montant_brut, 0.0), valeur_avant)
+    if retrait_brut <= 0:
+        return 0.0, 0.0
+
+    principal_retrait = 0.0
+    if getattr(definition, "type", None) == "cto":
+        restant = retrait_brut
+        lots = lots_cto.setdefault(compte_id, [])
+        for lot in lots:
+            if restant <= 0:
+                break
+            valeur_lot = max(float(lot.get("valeur", 0.0)), 0.0)
+            principal_lot = max(float(lot.get("principal", 0.0)), 0.0)
+            if valeur_lot <= 0:
+                continue
+            prelevement = min(restant, valeur_lot)
+            ratio = prelevement / valeur_lot
+            principal_retrait += principal_lot * ratio
+            lot["valeur"] = max(valeur_lot - prelevement, 0.0)
+            lot["principal"] = max(principal_lot - (principal_lot * ratio), 0.0)
+            restant -= prelevement
+        lots_cto[compte_id] = [lot for lot in lots if lot["valeur"] > 1e-9]
+        couts_revient[compte_id] = sum(lot["principal"] for lot in lots_cto[compte_id])
+    else:
+        cout = max(float(couts_revient.get(compte_id, 0.0)), 0.0)
+        ratio = retrait_brut / valeur_avant if valeur_avant > 0 else 0.0
+        principal_retrait = min(cout * ratio, retrait_brut)
+        couts_revient[compte_id] = max(cout - principal_retrait, 0.0)
+
+    plus_value = max(retrait_brut - principal_retrait, 0.0)
+    return retrait_brut, plus_value
+
+
+def _desinvestir_pour_couvrir_cash_negatif(
+    periode: pd.Period,
+    besoin_cash: float,
+    comptes_definitions: dict[str, object],
+    priorites_desinvestissement: list[str],
+    valeurs_comptes_investissement: dict[str, float],
+    couts_revient: dict[str, float],
+    lots_cto: dict[str, list[dict[str, float]]],
+    dates_premier_versement: dict[str, pd.Period | None],
+    retraits_effectues: dict[str, bool],
+) -> tuple[list[dict], float]:
+    if besoin_cash <= 0:
+        return [], 0.0
+
+    lignes: list[dict] = []
+    cash_recupere = 0.0
+    restant = besoin_cash
+
+    for compte_id in priorites_desinvestissement:
+        if restant <= 0:
+            break
+        definition = comptes_definitions.get(compte_id)
+        if definition is None or getattr(definition, "type", None) == "cash":
+            continue
+        while restant > 0:
+            retrait_brut, plus_value = _calculer_retrait_et_plus_value(
+                compte_id=compte_id,
+                montant_brut=restant,
+                definition=definition,
+                valeurs_comptes_investissement=valeurs_comptes_investissement,
+                couts_revient=couts_revient,
+                lots_cto=lots_cto,
+            )
+            if retrait_brut <= 0:
+                break
+
+            taux_fiscalite = float(getattr(definition, "fiscalite_plus_value_sortie", 0.0) or 0.0)
+            if getattr(definition, "type", None) == "pea":
+                date_ouverture = dates_premier_versement.get(compte_id)
+                anciennete = 0
+                if date_ouverture is not None:
+                    anciennete = periode.year - date_ouverture.year
+                    if periode.month < date_ouverture.month:
+                        anciennete -= 1
+                taux_fiscalite = 0.17 if anciennete >= 5 else 0.30
+
+            impot_plus_value = plus_value * taux_fiscalite
+            net = max(retrait_brut - impot_plus_value, 0.0)
+            valeurs_comptes_investissement[compte_id] = max(
+                float(valeurs_comptes_investissement.get(compte_id, 0.0)) - retrait_brut,
+                0.0,
+            )
+            retraits_effectues[compte_id] = True
+
+            lignes.append(
+                {
+                    "periode": periode,
+                    "id_module": "investissement_restant",
+                    "type_module": "investissement_restant",
+                    "flux_de_tresorerie": net,
+                    "categorie": "desinvestissement_compte",
+                    "compte": "cash",
+                    "description": f"Retrait depuis {compte_id}",
+                }
+            )
+            if impot_plus_value > 0:
+                lignes.append(
+                    {
+                        "periode": periode,
+                        "id_module": "fiscalite_comptes",
+                        "type_module": "fiscalite",
+                        "flux_de_tresorerie": -impot_plus_value,
+                        "categorie": "fiscalite_plus_value_compte",
+                        "compte": "cash",
+                        "description": f"Fiscalité sur plus-value ({compte_id})",
+                    }
+                )
+
+            cash_recupere += net
+            restant = max(restant - net, 0.0)
+            if float(valeurs_comptes_investissement.get(compte_id, 0.0)) <= 0:
+                break
+
+    return lignes, cash_recupere
 
 
 def exporter_resultats(resultat: ResultatSimulation, dossier_sortie: Path, generer_csv: bool = False) -> None:
@@ -375,6 +510,21 @@ def executer_simulation_depuis_config(
     if compte_initial in valeurs_comptes_investissement:
         valeurs_comptes_investissement[compte_initial] = config.portefeuille.bourse_initiale
     versements_cumules = {compte_id: 0.0 for compte_id in comptes_investissement}
+    couts_revient_comptes = {compte_id: 0.0 for compte_id in comptes_investissement}
+    retraits_effectues = {compte_id: False for compte_id in comptes_investissement}
+    dates_premier_versement: dict[str, pd.Period | None] = {compte_id: None for compte_id in comptes_investissement}
+    lots_cto: dict[str, list[dict[str, float]]] = {
+        compte_id: []
+        for compte_id, definition in comptes_definitions.items()
+        if getattr(definition, "type", None) == "cto"
+    }
+    if compte_initial in couts_revient_comptes:
+        couts_revient_comptes[compte_initial] = config.portefeuille.bourse_initiale
+        dates_premier_versement[compte_initial] = calendrier[0]
+        if getattr(comptes_definitions.get(compte_initial), "type", None) == "cto" and config.portefeuille.bourse_initiale > 0:
+            lots_cto.setdefault(compte_initial, []).append(
+                {"principal": config.portefeuille.bourse_initiale, "valeur": config.portefeuille.bourse_initiale}
+            )
 
     loyer_rp_courant = float(config.portefeuille.loyer_residence_principale)
     reste_a_vivre_minimum_courant = float(config.portefeuille.reste_a_vivre_minimum)
@@ -465,6 +615,30 @@ def executer_simulation_depuis_config(
         taux_bourse_mensuel = taux_mensuel_compose(taux_bourse_annuel)
         for compte_id in valeurs_comptes_investissement:
             valeurs_comptes_investissement[compte_id] *= 1 + taux_bourse_mensuel
+            if compte_id in lots_cto:
+                for lot in lots_cto[compte_id]:
+                    lot["valeur"] *= 1 + taux_bourse_mensuel
+
+        if etat.cash < 0:
+            lignes_desinvestissement, _cash_recupere = _desinvestir_pour_couvrir_cash_negatif(
+                periode=periode,
+                besoin_cash=-etat.cash,
+                comptes_definitions=comptes_definitions,
+                priorites_desinvestissement=list(reversed(config.portefeuille.priorites_allocation_investissement)),
+                valeurs_comptes_investissement=valeurs_comptes_investissement,
+                couts_revient=couts_revient_comptes,
+                lots_cto=lots_cto,
+                dates_premier_versement=dates_premier_versement,
+                retraits_effectues=retraits_effectues,
+            )
+            for ligne in lignes_desinvestissement:
+                lignes_registre.append(ligne)
+                montant = float(ligne["flux_de_tresorerie"])
+                appliquer_flux_cash(etat, montant)
+                flux_net_mensuel += montant
+                if montant < 0:
+                    sorties_tresorerie_mensuelles += -montant
+
         if config.portefeuille.indexer_reste_a_vivre_sur_inflation and idx > 0 and periode.month == 1:
             taux_inflation_annuel = contexte.taux_variable("inflation_annuelle", periode)
             reste_a_vivre_minimum_courant *= 1 + taux_inflation_annuel
@@ -478,11 +652,17 @@ def executer_simulation_depuis_config(
             priorites=config.portefeuille.priorites_allocation_investissement,
             comptes_definitions=comptes_definitions,
             versements_cumules=versements_cumules,
+            retraits_effectues=retraits_effectues,
         )
         montant_alloue = 0.0
         for compte, versement in allocations.items():
             valeurs_comptes_investissement[compte] = valeurs_comptes_investissement.get(compte, 0.0) + versement
             versements_cumules[compte] = versements_cumules.get(compte, 0.0) + versement
+            couts_revient_comptes[compte] = couts_revient_comptes.get(compte, 0.0) + versement
+            if dates_premier_versement.get(compte) is None:
+                dates_premier_versement[compte] = periode
+            if compte in lots_cto:
+                lots_cto[compte].append({"principal": versement, "valeur": versement})
             montant_alloue += versement
             lignes_registre.append(
                 {

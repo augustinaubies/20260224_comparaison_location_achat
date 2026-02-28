@@ -27,8 +27,10 @@
       - **PEL** : plafond de versement, logique de droits à prêt et conditions d'utilisation lors d'un achat immobilier.
       - **Livrets réglementés** : plafonds par produit (Livret A/LDDS/LEP) et intérêts non fiscalisés.
     - Sous-tâches ajoutées pour couvrir ces besoins spécifiques :
-      [] Implémenter le suivi des lots/PRU sur CTO pour fiscaliser uniquement les plus-values réalisées lors des retraits.
-      [] Ajouter la règle de blocage des versements PEA après premier retrait et modéliser la fiscalité des retraits selon l'ancienneté.
+      [X] Implémenter le suivi des lots/PRU sur CTO pour fiscaliser uniquement les plus-values réalisées lors des retraits.
+        - Implémenté via un suivi des lots CTO dans le moteur stateful (valorisation mensuelle + consommation FIFO en retrait) avec fiscalité appliquée uniquement sur la plus-value réalisée.
+      [X] Ajouter la règle de blocage des versements PEA après premier retrait et modéliser la fiscalité des retraits selon l'ancienneté.
+        - Implémenté dans le sweep stateful : après premier retrait d'un PEA, les versements sont bloqués ; la fiscalité de retrait applique 30% avant 5 ans et 17% à partir de 5 ans (sur la plus-value).
       [X] Modéliser les plafonds des livrets réglementés (au moins Livret A et LDDS) et leur absence de fiscalité.
         - Implémenté via `livret_reglemente` (`livret_a`/`ldds`/`lep`) avec plafonds par défaut et validation stricte de non-fiscalisation des sorties (fiscalité forcée à 0).
       [X] Détailler les règles PEL minimales (plafond, droits à prêt simplifiés) avant implémentation du prêt bonifié.

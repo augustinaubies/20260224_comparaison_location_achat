@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from simulation.moteur import generer_impot_revenu, generer_investissement_restant
 
@@ -249,3 +250,100 @@ modules: []
 
     assert resultat.registre_df[resultat.registre_df["categorie"] == "versement_restant"].empty
     assert float(resultat.synthese_df.iloc[-1]["tresorerie_fin"]) == 500.0
+
+
+def test_desinvestissement_cto_impose_plus_value(tmp_path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-02"
+hypotheses:
+  rendement_bourse_annuel: 3.0
+portefeuille:
+  tresorerie_initiale: 100
+  bourse_initiale: 0
+  taux_investissement_restant: 1.0
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: cto
+      type: cto
+  priorites_allocation_investissement: [cto]
+modules:
+  - id: depense
+    type: flux_fixe
+    debut: "2025-02"
+    fin: "2025-02"
+    montant: 105
+    sens: depense
+    categorie: depenses_courantes
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+    resultat = executer_simulation_depuis_config(config, dossier_sortie=tmp_path / "sortie")
+
+    retraits = resultat.registre_df[resultat.registre_df["categorie"] == "desinvestissement_compte"]
+    assert len(retraits) >= 1
+    assert float(retraits["flux_de_tresorerie"].sum()) > 101.0
+    fiscalite = resultat.registre_df[resultat.registre_df["categorie"] == "fiscalite_plus_value_compte"]
+    assert len(fiscalite) >= 1
+    assert float(fiscalite["flux_de_tresorerie"].sum()) < 0.0
+    assert float(resultat.synthese_df.iloc[-1]["tresorerie_fin"]) < 0.0
+
+
+def test_pea_bloque_versements_apres_premier_retrait(tmp_path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-02"
+hypotheses:
+  rendement_bourse_annuel: 0.0
+portefeuille:
+  tresorerie_initiale: 0
+  bourse_initiale: 200
+  compte_investissement_restant: pea
+  taux_investissement_restant: 1.0
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: pea
+      type: pea
+    - id: cto
+      type: cto
+  priorites_allocation_investissement: [pea, cto]
+modules:
+  - id: depense_janvier
+    type: flux_fixe
+    debut: "2025-01"
+    fin: "2025-01"
+    montant: 50
+    sens: depense
+    categorie: depenses_courantes
+  - id: salaire_fevrier
+    type: flux_fixe
+    debut: "2025-02"
+    fin: "2025-02"
+    montant: 100
+    sens: revenu
+    categorie: salaire
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+    resultat = executer_simulation_depuis_config(config, dossier_sortie=tmp_path / "sortie")
+
+    registre = resultat.registre_df
+    retraits = registre[registre["categorie"] == "desinvestissement_compte"]
+    assert retraits["periode"].astype(str).tolist() == ["2025-01"]
+    assert retraits["flux_de_tresorerie"].tolist() == [50.0]
+
+    versements = registre[registre["categorie"] == "versement_restant"]
+    assert versements["compte"].tolist() == ["cto"]
+    assert versements["flux_de_tresorerie"].tolist() == [-100.0]
