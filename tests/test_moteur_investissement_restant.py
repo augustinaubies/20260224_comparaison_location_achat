@@ -295,6 +295,50 @@ modules:
     assert float(resultat.synthese_df.iloc[-1]["tresorerie_fin"]) < 0.0
 
 
+def test_desinvestissement_ne_double_pas_la_fiscalite(tmp_path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-02"
+hypotheses:
+  rendement_bourse_annuel: 3.0
+portefeuille:
+  tresorerie_initiale: 200
+  bourse_initiale: 0
+  taux_investissement_restant: 1.0
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: cto
+      type: cto
+  priorites_allocation_investissement: [cto]
+modules:
+  - id: depense
+    type: flux_fixe
+    debut: "2025-02"
+    fin: "2025-02"
+    montant: 100
+    sens: depense
+    categorie: depenses_courantes
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+    resultat = executer_simulation_depuis_config(config, dossier_sortie=tmp_path / "sortie")
+
+    registre = resultat.registre_df
+    desinvestissement = float(registre[registre["categorie"] == "desinvestissement_compte"]["flux_de_tresorerie"].sum())
+    fiscalite = float(registre[registre["categorie"] == "fiscalite_plus_value_compte"]["flux_de_tresorerie"].sum())
+
+    assert desinvestissement > 100.0
+    assert fiscalite < 0.0
+    assert desinvestissement + fiscalite == pytest.approx(100.0, abs=1e-6)
+    assert float(resultat.synthese_df.iloc[-1]["tresorerie_fin"]) == pytest.approx(0.0, abs=1e-6)
+
+
 def test_pea_bloque_versements_apres_premier_retrait(tmp_path) -> None:
     defaut = tmp_path / "parametres.defaut.yaml"
     defaut.write_text(
