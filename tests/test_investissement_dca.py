@@ -17,7 +17,11 @@ simulation:
   date_debut: "2025-01"
   date_fin: "2025-01"
 portefeuille:
-  comptes: ["cash", "courtier"]
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: courtier
+      type: cto
 modules:
   - id: "dca"
     type: "investissement_dca"
@@ -41,7 +45,11 @@ simulation:
   date_debut: "2025-01"
   date_fin: "2025-01"
 portefeuille:
-  comptes: ["cash", "courtier"]
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: courtier
+      type: cto
 modules:
   - id: "locatif"
     type: "immobilier_locatif"

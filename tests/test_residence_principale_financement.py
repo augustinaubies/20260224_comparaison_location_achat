@@ -16,7 +16,7 @@ def test_rp_financement_inclut_travaux_et_apport_depuis_cash_puis_bourse(tmp_pat
             "portefeuille": {
                 "tresorerie_initiale": 5000,
                 "bourse_initiale": 10000,
-                "comptes": ["cash", "courtier"],
+                "comptes_definitions": [{"id": "cash", "type": "cash"}, {"id": "courtier", "type": "cto"}],
                 "taux_investissement_restant": 0.0,
             },
             "modules": [
@@ -64,7 +64,7 @@ def test_rapport_contient_bourse_initiale(tmp_path: Path) -> None:
             "portefeuille": {
                 "tresorerie_initiale": 1000,
                 "bourse_initiale": 3000,
-                "comptes": ["cash", "courtier"],
+                "comptes_definitions": [{"id": "cash", "type": "cash"}, {"id": "courtier", "type": "cto"}],
                 "taux_investissement_restant": 0.0,
             },
             "modules": [],
@@ -84,7 +84,7 @@ def test_loyer_residence_principale_revalorise_au_premier_janvier(tmp_path: Path
             "hypotheses": {"indexation_loyers_annuelle": 0.12},
             "portefeuille": {
                 "tresorerie_initiale": 10000,
-                "comptes": ["cash", "courtier"],
+                "comptes_definitions": [{"id": "cash", "type": "cash"}, {"id": "courtier", "type": "cto"}],
                 "taux_investissement_restant": 0.0,
                 "loyer_residence_principale": 1000,
             },
@@ -108,7 +108,7 @@ def test_reste_a_vivre_limite_investissement_automatique(tmp_path: Path) -> None
             "hypotheses": {"rendement_bourse_annuel": 0.0},
             "portefeuille": {
                 "tresorerie_initiale": 0.0,
-                "comptes": ["cash", "courtier"],
+                "comptes_definitions": [{"id": "cash", "type": "cash"}, {"id": "courtier", "type": "cto"}],
                 "taux_investissement_restant": 1.0,
                 "reste_a_vivre_minimum": 1000.0,
                 "indexer_reste_a_vivre_sur_inflation": False,

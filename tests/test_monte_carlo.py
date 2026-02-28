@@ -30,7 +30,11 @@ monte_carlo:
       borne_max: 0.1
 portefeuille:
   tresorerie_initiale: 1000
-  comptes: ["cash", "courtier"]
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: courtier
+      type: cto
 modules:
   - id: "salaire"
     type: "flux_fixe"

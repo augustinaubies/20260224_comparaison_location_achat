@@ -21,7 +21,11 @@ hypotheses:
   rendement_bourse_annuel: 0.05
 portefeuille:
   tresorerie_initiale: 1000
-  comptes: ["cash", "courtier"]
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: courtier
+      type: cto
 modules:
   - id: "salaire"
     type: "flux_fixe"
@@ -122,7 +126,11 @@ hypotheses:
   inflation_annuelle: 0.02
 portefeuille:
   tresorerie_initiale: 1000
-  comptes: ["cash", "courtier"]
+  comptes_definitions:
+    - id: cash
+      type: cash
+    - id: courtier
+      type: cto
 modules: []
 """.strip(),
         encoding="utf-8",
