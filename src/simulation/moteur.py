@@ -506,6 +506,8 @@ def executer_simulation_depuis_config(
         bourse=config.portefeuille.bourse_initiale,
     )
     valeurs_comptes_investissement = {compte_id: 0.0 for compte_id in comptes_investissement}
+    etat.comptes_investissement = valeurs_comptes_investissement
+    etat.comptes_definitions = comptes_definitions
     compte_initial = next(
         (compte for compte in config.portefeuille.priorites_allocation_investissement if compte in valeurs_comptes_investissement),
         None,
