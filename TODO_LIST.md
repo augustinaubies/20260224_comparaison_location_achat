@@ -63,3 +63,5 @@
     - Introduit via `SourceTaux` + `ContexteSimulation.taux_variable(...)` : les modules/moteur consomment un accès uniforme aux taux sans connaître l'origine (constante, profil temporel, Monte Carlo).
   [X] Supprimer le champ legacy `portefeuille.comptes` au profit de `portefeuille.comptes_definitions` pour éliminer une redondance de configuration et ses branches mortes associées.
     - `ConfigurationPortefeuille` est désormais stricte (`extra=forbid`) ; `comptes` n'est plus accepté en entrée et reste exposé en propriété dérivée depuis `comptes_definitions` pour compatibilité interne.
+  [X] Supprimer le support legacy `duree_mois` dans les configurations d'emprunt pour éliminer la branche de conversion implicite vers `duree_annees`.
+    - Les schémas rejettent désormais explicitement `duree_mois` (module emprunt et emprunt intégré immobilier), ce qui supprime la normalisation legacy silencieuse.
