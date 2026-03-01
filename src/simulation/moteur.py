@@ -480,9 +480,9 @@ def executer_simulation_depuis_config(
     calendrier = construire_calendrier_mensuel(config.simulation.date_debut, config.simulation.date_fin)
     contexte = ContexteSimulation(
         calendrier=calendrier,
-        hypotheses=config.hypotheses.model_dump(),
+        taux_variables=config.taux_variables.model_dump(),
         comptes=config.portefeuille.comptes,
-        source_taux=SourceTaux(config.hypotheses.model_dump()),
+        source_taux=SourceTaux(config.taux_variables.model_dump()),
     )
 
     modules = [creer_module(config_module) for config_module in config.modules]
@@ -577,7 +577,7 @@ def executer_simulation_depuis_config(
                 revenu = float(base.get("revenu_imposable", 0.0)) + 0.5 * float(base.get("loyers_imposables", 0.0))
                 impot = calculer_impot_progressif_france(
                     revenu,
-                    inflation_annuelle=config.hypotheses.inflation_annuelle,
+                    inflation_annuelle=config.taux_variables.inflation_annuelle,
                     annee_imposition=annee_reference,
                 )
                 if impot > 0:

@@ -16,7 +16,7 @@ def ecrire_parametres_defaut(chemin: Path) -> None:
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-02"
-hypotheses:
+taux_variables:
   inflation_annuelle: 0.02
   rendement_bourse_annuel: 0.05
 portefeuille:
@@ -122,7 +122,7 @@ def test_fusion_configuration_utilisateur_ecrase_defaut(tmp_path: Path) -> None:
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-01"
-hypotheses:
+taux_variables:
   inflation_annuelle: 0.02
 portefeuille:
   tresorerie_initiale: 1000
@@ -147,10 +147,28 @@ portefeuille:
 
     assert config.portefeuille.tresorerie_initiale == 2500
     assert config.portefeuille.comptes == ["cash", "courtier"]
-    assert config.hypotheses.inflation_annuelle == 0.02
+    assert config.taux_variables.inflation_annuelle == 0.02
 
 
-def test_configuration_rejette_anciennes_cles_hypotheses(tmp_path: Path) -> None:
+def test_configuration_rejette_anciennes_cles_taux_variables(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    defaut.write_text(
+        """
+simulation:
+  date_debut: "2025-01"
+  date_fin: "2025-01"
+taux_variables:
+  inflation: 0.02
+modules: []
+""".strip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match=r"taux_variables\.inflation"):
+        charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")
+
+
+def test_configuration_rejette_section_hypotheses_legacy(tmp_path: Path) -> None:
     defaut = tmp_path / "parametres.defaut.yaml"
     defaut.write_text(
         """
@@ -158,11 +176,11 @@ simulation:
   date_debut: "2025-01"
   date_fin: "2025-01"
 hypotheses:
-  inflation: 0.02
+  inflation_annuelle: 0.02
 modules: []
 """.strip(),
         encoding="utf-8",
     )
 
-    with pytest.raises(ValueError, match=r"hypotheses\.inflation"):
+    with pytest.raises(ValueError, match=r"hypotheses"):
         charger_configuration(defaut, tmp_path / "parametres.utilisateur.yaml")

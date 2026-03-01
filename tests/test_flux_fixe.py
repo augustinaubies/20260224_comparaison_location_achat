@@ -21,7 +21,7 @@ def test_flux_fixe_non_indexe_constant() -> None:
     )
     contexte = ContexteSimulation(
         calendrier=pd.period_range("2025-01", "2025-03", freq="M"),
-        hypotheses={"inflation_annuelle": 0.12},
+        taux_variables={"inflation_annuelle": 0.12},
         comptes=["cash"],
     )
 
@@ -43,7 +43,7 @@ def test_flux_fixe_indexation_inflation() -> None:
     calendrier = pd.period_range("2025-01", "2025-03", freq="M")
     contexte = ContexteSimulation(
         calendrier=calendrier,
-        hypotheses={"inflation_annuelle": 0.12},
+        taux_variables={"inflation_annuelle": 0.12},
         comptes=["cash"],
     )
 
@@ -70,7 +70,7 @@ def test_flux_fixe_croissance_salaire_revalorisee_au_premier_janvier() -> None:
     calendrier = pd.period_range("2025-10", "2026-02", freq="M")
     contexte = ContexteSimulation(
         calendrier=calendrier,
-        hypotheses={"croissance_salaire_annuelle": 0.12},
+        taux_variables={"croissance_salaire_annuelle": 0.12},
         comptes=["cash"],
     )
 
@@ -96,7 +96,7 @@ def test_flux_fixe_indexation_loyer_revalorisee_au_premier_janvier() -> None:
     calendrier = pd.period_range("2025-11", "2026-02", freq="M")
     contexte = ContexteSimulation(
         calendrier=calendrier,
-        hypotheses={"indexation_loyers_annuelle": 0.03},
+        taux_variables={"indexation_loyers_annuelle": 0.03},
         comptes=["cash"],
     )
 
@@ -117,7 +117,7 @@ def test_flux_fixe_sans_bornes_utilise_calendrier_global() -> None:
     )
     contexte = ContexteSimulation(
         calendrier=pd.period_range("2025-01", "2025-04", freq="M"),
-        hypotheses={},
+        taux_variables={},
         comptes=["cash"],
     )
 
@@ -141,7 +141,7 @@ def test_flux_fixe_indexation_variable_par_periode() -> None:
     calendrier = pd.period_range("2025-12", "2027-02", freq="M")
     contexte = ContexteSimulation(
         calendrier=calendrier,
-        hypotheses={"croissance_salaire_annuelle": {"2026": 0.10, "2027": 0.20}},
+        taux_variables={"croissance_salaire_annuelle": {"2026": 0.10, "2027": 0.20}},
         comptes=["cash"],
     )
 

@@ -25,16 +25,16 @@ def taux_annuel_depuis_source(source: object, periode: pd.Period) -> float:
     return 0.0
 
 
-def taux_annuel_pour_periode(hypotheses: Mapping[str, object], cle: str, periode: pd.Period) -> float:
-    return taux_annuel_depuis_source(hypotheses.get(cle, 0.0), periode)
+def taux_annuel_pour_periode(taux_variables: Mapping[str, object], cle: str, periode: pd.Period) -> float:
+    return taux_annuel_depuis_source(taux_variables.get(cle, 0.0), periode)
 
 
 @dataclass(frozen=True, slots=True)
 class SourceTaux:
-    hypotheses: Mapping[str, object]
+    taux_variables: Mapping[str, object]
 
     def taux_annuel(self, cle: str, periode: pd.Period) -> float:
-        return taux_annuel_depuis_source(self.hypotheses.get(cle, 0.0), periode)
+        return taux_annuel_depuis_source(self.taux_variables.get(cle, 0.0), periode)
 
 
 def facteur_indexation_annuelle_variable(

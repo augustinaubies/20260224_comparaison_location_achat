@@ -67,7 +67,7 @@ def executer_simulations_monte_carlo(
         for cle, distribution in distributions.items():
             tirage_hypotheses[cle] = distribution.tirer(rng)
 
-        config_tirage.hypotheses = config_tirage.hypotheses.model_copy(update=tirage_hypotheses)
+        config_tirage.taux_variables = config_tirage.taux_variables.model_copy(update=tirage_hypotheses)
 
         dossier_tirage = dossier_sortie / "_runs" / f"tirage_{indice:04d}"
         resultat = executer_simulation_depuis_config(config_tirage, dossier_sortie=dossier_tirage)

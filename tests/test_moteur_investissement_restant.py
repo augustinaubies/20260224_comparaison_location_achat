@@ -192,7 +192,7 @@ def test_investissement_restant_allocation_par_priorite_et_plafond(tmp_path) -> 
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-01"
-hypotheses:
+taux_variables:
   rendement_bourse_annuel: 0.0
 portefeuille:
   tresorerie_initiale: 1000
@@ -227,7 +227,7 @@ def test_investissement_restant_reste_en_cash_si_aucune_allocation_possible(tmp_
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-01"
-hypotheses:
+taux_variables:
   rendement_bourse_annuel: 0.0
 portefeuille:
   tresorerie_initiale: 500
@@ -259,7 +259,7 @@ def test_desinvestissement_cto_impose_plus_value(tmp_path) -> None:
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-02"
-hypotheses:
+taux_variables:
   rendement_bourse_annuel: 3.0
 portefeuille:
   tresorerie_initiale: 100
@@ -302,7 +302,7 @@ def test_desinvestissement_ne_double_pas_la_fiscalite(tmp_path) -> None:
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-02"
-hypotheses:
+taux_variables:
   rendement_bourse_annuel: 3.0
 portefeuille:
   tresorerie_initiale: 200
@@ -346,7 +346,7 @@ def test_pea_bloque_versements_apres_premier_retrait(tmp_path) -> None:
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-02"
-hypotheses:
+taux_variables:
   rendement_bourse_annuel: 0.0
 portefeuille:
   tresorerie_initiale: 0
