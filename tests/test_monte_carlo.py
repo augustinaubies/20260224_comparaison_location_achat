@@ -22,6 +22,8 @@ taux_variables:
   revalorisation_immobiliere_annuelle: 0.01
   rendement_bourse_annuel: 0.05
 monte_carlo:
+  nombre_tirages: 3
+  graine: 11
   distributions:
     inflation_annuelle:
       moyenne: 0.02
@@ -72,6 +74,31 @@ def test_distributions_personnalisees_depuis_parametres(tmp_path: Path) -> None:
     assert distributions["inflation_annuelle"].borne_min == -0.02
 
 
+
+
+def test_configuration_initialise_taux_variables_depuis_monte_carlo_si_absents(tmp_path: Path) -> None:
+    defaut = tmp_path / "parametres.defaut.yaml"
+    utilisateur = tmp_path / "parametres.utilisateur.yaml"
+    ecrire_parametres_minimaux(defaut)
+    utilisateur.write_text("{}", encoding="utf-8")
+
+    contenu_sans_taux = defaut.read_text(encoding="utf-8").replace(
+        """taux_variables:
+  inflation_annuelle: 0.02
+  croissance_salaire_annuelle: 0.03
+  indexation_loyers_annuelle: 0.015
+  revalorisation_immobiliere_annuelle: 0.01
+  rendement_bourse_annuel: 0.05
+""",
+        "",
+    )
+    defaut.write_text(contenu_sans_taux, encoding="utf-8")
+
+    config = charger_configuration(defaut, utilisateur)
+
+    assert config.taux_variables.inflation_annuelle != 0.0
+    assert config.taux_variables.rendement_bourse_annuel != 0.0
+
 def test_monte_carlo_reproductible_et_exports_csv(tmp_path: Path) -> None:
     defaut = tmp_path / "parametres.defaut.yaml"
     utilisateur = tmp_path / "parametres.utilisateur.yaml"
@@ -104,3 +131,14 @@ def test_commande_cli_monte_carlo_genere_fichiers(tmp_path: Path, monkeypatch) -
     assert "monte_carlo_tirages.csv" in fichiers
     assert "monte_carlo_resume.csv" in fichiers
     assert "parametres.fusionnes.yaml" in fichiers
+
+
+def test_commande_cli_monte_carlo_utilise_parametrage_nombre_tirages(tmp_path: Path, monkeypatch) -> None:
+    ecrire_parametres_minimaux(tmp_path / "parametres.defaut.yaml")
+    (tmp_path / "parametres.utilisateur.yaml").write_text("{}", encoding="utf-8")
+    monkeypatch.setattr("simulation.cli.obtenir_racine_projet", lambda: tmp_path)
+
+    resultat = CliRunner().invoke(application, ["monte-carlo"])
+
+    assert resultat.exit_code == 0
+    assert "Monte Carlo (3 tirages)" in resultat.stdout

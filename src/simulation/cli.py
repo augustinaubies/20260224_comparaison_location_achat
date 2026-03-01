@@ -169,8 +169,8 @@ def commande_monte_carlo(
     parametres_utilisateur: Path = typer.Option(None, "--parametres-utilisateur", "--utilisateur"),
     sortie: Path | None = typer.Option(None, "--sortie"),
     nom_run: str | None = typer.Option("monte-carlo", "--nom-run"),
-    tirages: int = typer.Option(200, "--tirages", min=1),
-    graine: int = typer.Option(42, "--graine"),
+    tirages: int | None = typer.Option(None, "--tirages", min=1),
+    graine: int | None = typer.Option(None, "--graine"),
 ) -> None:
     """Lance plusieurs simulations avec des hypothèses tirées aléatoirement."""
     chemin_defaut = parametres_defaut or chemin_parametres_defaut()
@@ -182,11 +182,13 @@ def commande_monte_carlo(
 
         dossier_sortie = creer_dossier_sortie(sortie=sortie, nom_run=nom_run)
         config = charger_configuration(chemin_defaut, chemin_utilisateur)
+        tirages_effectifs = tirages or config.monte_carlo.nombre_tirages
+        graine_effective = graine if graine is not None else config.monte_carlo.graine
         resume_df = executer_simulations_monte_carlo(
             config=config,
             dossier_sortie=dossier_sortie,
-            nombre_tirages=tirages,
-            graine=graine,
+            nombre_tirages=tirages_effectifs,
+            graine=graine_effective,
         )
         exporter_parametrage_simulation(
             dossier_sortie=dossier_sortie,
@@ -199,7 +201,7 @@ def commande_monte_carlo(
         p10 = float(resume_df["patrimoine_total_final"].quantile(0.10))
         p90 = float(resume_df["patrimoine_total_final"].quantile(0.90))
 
-        table = Table(title=f"Monte Carlo ({tirages} tirages)")
+        table = Table(title=f"Monte Carlo ({tirages_effectifs} tirages)")
         table.add_column("Métrique")
         table.add_column("Valeur", justify="right")
         table.add_row("Patrimoine moyen", _formater_montant_terminal(moyenne))
