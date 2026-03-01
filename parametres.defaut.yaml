@@ -1,13 +1,9 @@
 simulation:
   date_debut: 2025-01
   date_fin: 2065-12
-taux_variables:
-  inflation_annuelle: 0.02
-  croissance_salaire_annuelle: 0.02
-  indexation_loyers_annuelle: 0.02
-  revalorisation_immobiliere_annuelle: 0.01
-  rendement_bourse_annuel: 0.05
 monte_carlo:
+  nombre_tirages: 1
+  graine: 42
   distributions:
     inflation_annuelle:
       moyenne: 0.02

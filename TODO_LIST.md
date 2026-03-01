@@ -74,3 +74,5 @@
     - Audit réalisé dans `docs/diagnostic_parametres_legacy.md` : `mois_paiement_impot_revenu` est utilisé, tandis que `devise` et `pas_de_temps` sont actuellement des métadonnées non consommées par le moteur.
   [X] Question utilisateur : pour `simulation.devise` et `simulation.pas_de_temps`, faut-il les supprimer strictement (validation en erreur), les déprécier temporairement, ou les conserver comme métadonnées ?
     - Décision utilisateur appliquée : suppression stricte de `simulation.devise` et `simulation.pas_de_temps` (schéma `simulation` en `extra=forbid` + retrait des clés des paramètres par défaut/scénarios).
+  [X] Retirer la section `taux_variables` des paramètres par défaut, utiliser un tirage Monte Carlo par défaut (même unique), et ajouter un paramètre de nombre de tirages Monte Carlo.
+    - Implémenté via `monte_carlo.nombre_tirages`/`monte_carlo.graine` dans la configuration ; si `taux_variables` est absent, le chargement initialise automatiquement un tirage depuis les distributions Monte Carlo.

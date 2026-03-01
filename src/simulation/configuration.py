@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal
 
+import numpy as np
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator, model_validator
 
@@ -69,6 +70,8 @@ class ConfigurationDistributionNormale(BaseModel):
 
 
 class ConfigurationMonteCarlo(BaseModel):
+    nombre_tirages: PositiveInt = 1
+    graine: int = 42
     distributions: dict[str, ConfigurationDistributionNormale] = Field(
         default_factory=lambda: {
             cle: ConfigurationDistributionNormale(**distribution)
@@ -370,4 +373,20 @@ def charger_configuration(path_defaut: Path, path_utilisateur: Path) -> Configur
     donnees_utilisateur = charger_yaml(path_utilisateur)
     donnees_fusionnees = fusion_profonde(donnees_defaut, donnees_utilisateur)
     donnees_fusionnees = _resoudre_references_config(donnees_fusionnees, donnees_fusionnees)
-    return ConfigurationRacine.model_validate(donnees_fusionnees)
+    config = ConfigurationRacine.model_validate(donnees_fusionnees)
+
+    if "taux_variables" not in donnees_fusionnees:
+        rng = np.random.default_rng(config.monte_carlo.graine)
+        tirage_taux_variables: dict[str, float] = {}
+        for cle, distribution in config.monte_carlo.distributions.items():
+            if not hasattr(config.taux_variables, cle):
+                continue
+            valeur = float(rng.normal(distribution.moyenne, distribution.ecart_type))
+            if distribution.borne_min is not None:
+                valeur = max(distribution.borne_min, valeur)
+            if distribution.borne_max is not None:
+                valeur = min(distribution.borne_max, valeur)
+            tirage_taux_variables[cle] = valeur
+        config.taux_variables = config.taux_variables.model_copy(update=tirage_taux_variables)
+
+    return config
