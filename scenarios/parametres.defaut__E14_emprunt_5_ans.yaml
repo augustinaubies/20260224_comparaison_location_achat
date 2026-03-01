@@ -1,7 +1,7 @@
 simulation:
   date_debut: 2025-01
   date_fin: 2037-12
-hypotheses:
+taux_variables:
   inflation_annuelle: 0.02
   croissance_salaire_annuelle: 0.02
   indexation_loyers_annuelle: 0.02

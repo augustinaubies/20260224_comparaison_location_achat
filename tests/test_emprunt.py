@@ -19,7 +19,7 @@ def test_emprunt_amortissement_et_capital_restant() -> None:
         compte="cash",
     )
     contexte = ContexteSimulation(
-        calendrier=pd.period_range("2025-01", "2026-12", freq="M"), hypotheses={}, comptes=["cash"]
+        calendrier=pd.period_range("2025-01", "2026-12", freq="M"), taux_variables={}, comptes=["cash"]
     )
 
     sortie = ModuleEmprunt(config).executer(contexte)

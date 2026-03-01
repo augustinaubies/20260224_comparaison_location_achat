@@ -14,14 +14,14 @@ from ..taux import SourceTaux
 @dataclass(slots=True)
 class ContexteSimulation:
     calendrier: pd.PeriodIndex
-    hypotheses: dict[str, object]
+    taux_variables: dict[str, object]
     comptes: list[str]
     source_taux: SourceTaux | None = None
 
     def taux_variable(self, cle: str, periode: pd.Period) -> float:
         if self.source_taux is not None:
             return self.source_taux.taux_annuel(cle, periode)
-        return SourceTaux(self.hypotheses).taux_annuel(cle, periode)
+        return SourceTaux(self.taux_variables).taux_annuel(cle, periode)
 
 
 @dataclass(slots=True)

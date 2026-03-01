@@ -12,7 +12,7 @@ def test_rp_financement_inclut_travaux_et_apport_depuis_cash_puis_bourse(tmp_pat
     config = ConfigurationRacine.model_validate(
         {
             "simulation": {"date_debut": "2025-02", "date_fin": "2025-04"},
-            "hypotheses": {"rendement_bourse_annuel": 0.0},
+            "taux_variables": {"rendement_bourse_annuel": 0.0},
             "portefeuille": {
                 "tresorerie_initiale": 5000,
                 "bourse_initiale": 10000,
@@ -81,7 +81,7 @@ def test_loyer_residence_principale_revalorise_au_premier_janvier(tmp_path: Path
     config = ConfigurationRacine.model_validate(
         {
             "simulation": {"date_debut": "2025-10", "date_fin": "2026-02"},
-            "hypotheses": {"indexation_loyers_annuelle": 0.12},
+            "taux_variables": {"indexation_loyers_annuelle": 0.12},
             "portefeuille": {
                 "tresorerie_initiale": 10000,
                 "comptes_definitions": [{"id": "cash", "type": "cash"}, {"id": "courtier", "type": "cto"}],
@@ -105,7 +105,7 @@ def test_reste_a_vivre_limite_investissement_automatique(tmp_path: Path) -> None
     config = ConfigurationRacine.model_validate(
         {
             "simulation": {"date_debut": "2025-01", "date_fin": "2025-01"},
-            "hypotheses": {"rendement_bourse_annuel": 0.0},
+            "taux_variables": {"rendement_bourse_annuel": 0.0},
             "portefeuille": {
                 "tresorerie_initiale": 0.0,
                 "comptes_definitions": [{"id": "cash", "type": "cash"}, {"id": "courtier", "type": "cto"}],
@@ -143,7 +143,7 @@ def test_rp_utilise_pret_pel_si_disponible(tmp_path: Path) -> None:
     config = ConfigurationRacine.model_validate(
         {
             "simulation": {"date_debut": "2025-01", "date_fin": "2025-03"},
-            "hypotheses": {"rendement_bourse_annuel": 0.0},
+            "taux_variables": {"rendement_bourse_annuel": 0.0},
             "portefeuille": {
                 "tresorerie_initiale": 0,
                 "bourse_initiale": 50000,

@@ -32,7 +32,7 @@ def test_locatif_registre_et_colonnes() -> None:
         compte="cash",
     )
     contexte = ContexteSimulation(
-        calendrier=pd.period_range("2025-01", "2026-12", freq="M"), hypotheses={}, comptes=["cash"]
+        calendrier=pd.period_range("2025-01", "2026-12", freq="M"), taux_variables={}, comptes=["cash"]
     )
 
     sortie = ModuleImmobilierLocatif(config).executer(contexte)
@@ -69,7 +69,7 @@ def test_locatif_loyer_revalorise_au_premier_janvier_et_valeur_bien_mensuelle() 
     calendrier = pd.period_range("2025-10", "2026-02", freq="M")
     contexte = ContexteSimulation(
         calendrier=calendrier,
-        hypotheses={
+        taux_variables={
             "indexation_loyers_annuelle": 0.12,
             "revalorisation_immobiliere_annuelle": 0.12,
         },

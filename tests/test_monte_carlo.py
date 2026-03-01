@@ -15,7 +15,7 @@ def ecrire_parametres_minimaux(chemin: Path) -> None:
 simulation:
   date_debut: "2025-01"
   date_fin: "2025-03"
-hypotheses:
+taux_variables:
   inflation_annuelle: 0.02
   croissance_salaire_annuelle: 0.03
   indexation_loyers_annuelle: 0.015

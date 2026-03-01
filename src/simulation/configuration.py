@@ -16,7 +16,7 @@ class ConfigurationSimulation(BaseModel):
     mois_paiement_impot_revenu: int = Field(default=9, ge=1, le=12)
 
 
-class ConfigurationHypotheses(BaseModel):
+class ConfigurationTauxVariables(BaseModel):
     model_config = ConfigDict(extra="forbid")
     inflation_annuelle: float | dict[str, float] = 0.0
     croissance_salaire_annuelle: float | dict[str, float] = 0.0
@@ -297,8 +297,10 @@ ConfigurationModule = Annotated[
 
 
 class ConfigurationRacine(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     simulation: ConfigurationSimulation
-    hypotheses: ConfigurationHypotheses = Field(default_factory=ConfigurationHypotheses)
+    taux_variables: ConfigurationTauxVariables = Field(default_factory=ConfigurationTauxVariables)
     monte_carlo: ConfigurationMonteCarlo = Field(default_factory=ConfigurationMonteCarlo)
     portefeuille: ConfigurationPortefeuille = Field(default_factory=ConfigurationPortefeuille)
     modules: list[ConfigurationModule] = Field(default_factory=list)
